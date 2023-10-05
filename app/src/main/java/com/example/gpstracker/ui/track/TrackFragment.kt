@@ -55,9 +55,13 @@ class TrackFragment : BaseFragment() {
 
 
        binding.startButton.setOnClickListener {
-           binding.statefulCircleView.setState(TrackerState.DISCONNECTED)
+           binding.statefulCircleView.setState(TrackerState.ON)
 
-            //binding.progressBar5.setState(TrackerState.OFF)
+           val statefulCircleView = binding.statefulCircleView
+           statefulCircleView.setProgressBarColor(resources.getColor(R.color.colorAccent))
+
+
+           //binding.progressBar5.setState(TrackerState.OFF)
 
 
            /*            gpsStatusOn()

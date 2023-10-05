@@ -7,18 +7,6 @@
     tools:context=".YourActivity">
 
 
-    <ProgressBar
-        android:id="@+id/progressBar2"
-        android:progressDrawable="@drawable/custom_circular_progress"
-        android:layout_width="220dp"
-        android:layout_height="220dp"
-        app:layout_constraintBottom_toBottomOf="@+id/statefulCircleView"
-        app:layout_constraintEnd_toEndOf="@+id/statefulCircleView"
-        app:layout_constraintHorizontal_bias="0.620"
-        app:layout_constraintStart_toStartOf="@+id/statefulCircleView"
-        app:layout_constraintTop_toTopOf="@+id/statefulCircleView"
-        app:layout_constraintVertical_bias="0.336" />
-
     <com.example.gpstracker.ui.track.StatefulCircleView
         android:id="@+id/statefulCircleView"
         android:layout_width="140dp"

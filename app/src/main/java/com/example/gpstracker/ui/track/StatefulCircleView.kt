@@ -10,6 +10,7 @@ import android.util.AttributeSet
 import android.view.View
 import com.example.gpstracker.utils.TrackerState
 import android.graphics.Canvas
+import android.graphics.RectF
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.RelativeLayout.CENTER_IN_PARENT
@@ -22,6 +23,8 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
     private val exclamationPaint = Paint()
     private val exclamationPath = Path()
     private val image: Bitmap
+    private var progressBarColor = resources.getColor(R.color.light_grey)
+    private var isProgressBarSpinning = false
 
     init {
         circlePaint.color = resources.getColor(R.color.grey) // Default color for OFF state
@@ -38,29 +41,43 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
         invalidate() // Redraw the view to reflect the new state
     }
 
+    fun setProgressBarColor(color: Int) {
+        progressBarColor = color
+        invalidate() // Redraw the view to reflect the new color
+    }
+
+    fun startProgressBarSpin() {
+
+    }
+
+    fun stopProgressBarSpin() {
+
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val centerX = width / 1.5f
+        val centerX = width / 2.2f
         val centerY = height / 2f
         val radius = Math.min(centerX, centerY)
 
         // Draw the image in the center
-        val imageLeft = centerX - image.width / 1
+        val imageLeft = centerX - image.width / 2
         val imageTop = centerY - image.height / 2
         canvas.drawBitmap(image, imageLeft, imageTop, null)
 
         when (state) {
             TrackerState.OFF -> {
                 // Draw the circle (3 times smaller)
-                val smallerRadius = radius / 4f
+                val smallerRadius = radius / 5f
                 canvas.drawCircle(centerX, centerY, smallerRadius, circlePaint)
             }
             TrackerState.ON -> {
                 // Draw the circle in yellow (3 times smaller)
-                val smallerRadius = radius / 3f
+                val smallerRadius = radius / 5f
                 circlePaint.color = resources.getColor(R.color.colorAccent)
                 canvas.drawCircle(centerX, centerY, smallerRadius, circlePaint)
+
             }
             TrackerState.DISCONNECTED -> {
                 // Draw a red exclamation mark in the center for the ERROR state
@@ -80,7 +97,22 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
 
                 // Restore the paint style to stroke for any future drawing
                 exclamationPaint.style = Paint.Style.STROKE
+
             }
         }
+
+        // Draw the custom circle progress bar in the middle
+        val progressBarRadius = radius -20  // Adjust the size as needed (smaller radius)
+        val progressBarRect = RectF(
+            centerX - progressBarRadius,
+            centerY - progressBarRadius,
+            centerX + progressBarRadius,
+            centerY + progressBarRadius
+        )
+        val progressBarPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        progressBarPaint.style = Paint.Style.STROKE
+        progressBarPaint.color = progressBarColor
+                progressBarPaint.strokeWidth = 30f // Adjust the progress bar width as needed
+        canvas.drawArc(progressBarRect, 0f, 360f, false, progressBarPaint)
     }
 }

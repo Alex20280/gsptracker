@@ -3,6 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id ("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
+    id("com.google.gms.google-services")
+    //id ("com.google.firebase.crashlytics")
 }
 
 android {
@@ -62,6 +64,9 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
+    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
+
 
     //Test
     testImplementation("junit:junit:4.13.2")
@@ -119,16 +124,21 @@ dependencies {
     implementation ("com.google.code.gson:gson:2.10.1")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
-/*    //Room
+    //Room
     implementation("androidx.room:room-runtime:2.5.2")
-    annotationProcessor("androidx.room:room-compiler:2.5.2")
-    //kapt("androidx.room:room-compiler:2.5.0")
+    kapt("androidx.room:room-compiler:2.5.2")
+    implementation("androidx.room:room-ktx:2.5.2")
+
+    //Room
+/*    implementation("androidx.room:room-common:2.5.2")
+    implementation("androidx.room:room-runtime:2.5.2")
+    //annotationProcessor("androidx.room:room-compiler:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")*/
 
     //Firebase
-    implementation (platform("com.google.firebase:firebase-bom:31.4.0"))
-    implementation ("com.google.firebase:firebase-analytics-ktx")
-    implementation ("com.google.firebase:firebase-crashlytics-ktx")
-    implementation ("com.google.firebase:firebase-messaging-ktx")
+    //implementation (platform("com.google.firebase:firebase-bom:31.4.0"))
+    implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
 
 }

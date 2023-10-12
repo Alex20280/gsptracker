@@ -1,11 +1,20 @@
 package com.example.gpstracker.di
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.gpstracker.roomdb.LocationRepository
+import com.example.gpstracker.roomdb.LocationRepositoryImpl
+import com.example.gpstracker.roomdb.dao.LocationDao
 import com.example.gpstracker.ui.forgetpassword.viewmodel.ForgetPasswordViewModel
 import com.example.gpstracker.ui.signin.viewmodel.SignInViewModel
 import com.example.gpstracker.ui.signup.viewmodel.SignUpViewModel
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
+import com.example.gpstracker.usecase.FirebaseAuthenticationUseCase
+import com.example.gpstracker.usecase.LocationServiceUseCase
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import dagger.Binds
 import dagger.MapKey
 import dagger.Module
@@ -18,7 +27,14 @@ import javax.inject.Singleton
 import kotlin.reflect.KClass
 
 @Singleton
-class ViewModelFactory @Inject constructor(private val viewModels: MutableMap<Class<out ViewModel>, Provider<ViewModel>>) : ViewModelProvider.Factory {
+class ViewModelFactory @Inject constructor(
+    private val fusedLocationProviderClient: FusedLocationProviderClient,
+    private val databaseReference: DatabaseReference,
+    private val viewModels: MutableMap<Class<out ViewModel>,
+            Provider<ViewModel>>,
+    private val context: Context,
+    private val locationDao: LocationDao
+) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val viewModelProvider = viewModels[modelClass]
@@ -28,17 +44,32 @@ class ViewModelFactory @Inject constructor(private val viewModels: MutableMap<Cl
         }
         when {
             modelClass.isAssignableFrom(SignInViewModel::class.java) -> {
-                return SignInViewModel() as T
+                return SignInViewModel(
+                    firebaseAuthenticationUseCase = FirebaseAuthenticationUseCase(
+                        auth = FirebaseAuth.getInstance()
+                    )
+                ) as T
             }
+
             modelClass.isAssignableFrom(SignUpViewModel::class.java) -> {
-                return SignUpViewModel() as T
+                return SignUpViewModel(registrationUseCase = FirebaseAuthenticationUseCase(auth = FirebaseAuth.getInstance())) as T
             }
+
             modelClass.isAssignableFrom(TrackViewModel::class.java) -> {
-                return TrackViewModel() as T
+                return TrackViewModel(
+                    locationServiceUseCase = LocationServiceUseCase(
+                        fusedLocationClient = fusedLocationProviderClient,
+                        database = databaseReference
+                    ), firebaseDatabase = databaseReference,
+                    applicationContext = context,
+                    locationRepository = LocationRepositoryImpl(locationDao)
+                ) as T
             }
+
             modelClass.isAssignableFrom(ForgetPasswordViewModel::class.java) -> {
                 return ForgetPasswordViewModel() as T
             }
+
             else -> throw IllegalArgumentException("Unknown ViewModel class: $modelClass")
         }
     }

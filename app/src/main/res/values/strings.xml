@@ -11,4 +11,6 @@
     <string name="enter_your_email_address_here">Enter your email address here</string>
     <string name="email">Email</string>
     <string name="register">Register</string>
+    <string name="invalid_password_warning">Password must be at least 8 characters, should have digits, latters, special character and at least 1 uppercase letter</string>
+    <string name="invalid_email_warning">Invalid email</string>
 </resources>

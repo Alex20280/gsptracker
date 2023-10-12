@@ -1,5 +1,6 @@
 package com.example.gpstracker.di
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.example.gpstracker.app.App
@@ -10,10 +11,22 @@ import javax.inject.Singleton
 
 @Module
 class AppModule(private val application: App) {
-    @Provides
+/*    @Provides
     @Singleton
     fun provideApplicationContext(): Context {
         return application
+    }*/
+
+    @Provides
+    @Singleton
+    fun provideApplication(): Application {
+        return application
+    }
+
+    @Provides
+    @Singleton
+    fun provideApplicationContext(application: Application): Context {
+        return application.applicationContext
     }
 
     @Provides

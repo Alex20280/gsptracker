@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1063602292263",
+    "project_id": "gpstracker-89164",
+    "storage_bucket": "gpstracker-89164.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1063602292263:android:fae97aa5c0762b895c7002",
+        "android_client_info": {
+          "package_name": "com.example.gpstracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAS2LGokIdfMdi6_uRbwtc7K37iFQXmPv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,26 +2,19 @@ package com.example.gpstracker.usecase
 
 import android.annotation.SuppressLint
 import android.location.Location
-import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DatabaseReference
 import com.example.gpstracker.ui.track.LocationData
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resumeWithException
 
-class LocationServiceUseCase(
+class FirebaseDatabaseUseCase(
     private val fusedLocationClient: FusedLocationProviderClient,
     private val database: DatabaseReference
 ) {
 
     @SuppressLint("MissingPermission")
-    fun startLocationUpdates() {
+    fun saveLocation() {
         // Start location tracking
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
@@ -29,6 +22,11 @@ class LocationServiceUseCase(
                     saveLocationToFirebase(location.latitude, location.longitude)
                   }
             }
+    }
+
+    fun saveLocationFromRoomDatabase(latitude: Double, longitude: Double) : Boolean {
+        saveLocationToFirebase(latitude, longitude)
+        return true
     }
 
     private fun saveLocationToFirebase(latitude: Double, longitude: Double) {
@@ -44,7 +42,7 @@ class LocationServiceUseCase(
         locationEntry.setValue(locationData)
     }
 
-    @SuppressLint("MissingPermission")
+/*    @SuppressLint("MissingPermission")
     fun getCurrentLocation(callback: (LocationData?) -> Unit) {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
@@ -58,5 +56,5 @@ class LocationServiceUseCase(
             .addOnFailureListener { exception ->
                 callback(null)
             }
-    }
+    }*/
 }

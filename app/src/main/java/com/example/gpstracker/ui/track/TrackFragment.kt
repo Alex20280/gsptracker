@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,7 +72,10 @@ class TrackFragment : Fragment() {
                 TrackerState.DISCONNECTED -> {
                     disconnectedCustomView()
                     buttonIsEnabled()
-                    stopTrackingPeriodically()
+                    //stopTrackingPeriodically()
+
+                    trackViewModel?.saveToRoomDatabase()
+                    trackViewModel?.syncLocalDatabaseAndRemoteDatabase()
                 }
             }
         }
@@ -130,10 +132,11 @@ class TrackFragment : Fragment() {
                     val isInternetConnected = trackViewModel?.isInternetConnected()
                     val isFirebaseConnected = trackViewModel?.isFirebaseDatabaseAvailable()
                     if (isInternetConnected == true && isFirebaseConnected == true) {
-                        trackViewModel?.startTracking()
+                        trackViewModel?.saveLocation()
                     } else {
                         trackViewModel?._stateLiveData?.postValue(TrackerState.DISCONNECTED)
-                        trackViewModel?.saveToRoomDatabase()
+                        //trackViewModel?.saveToRoomDatabase()
+                        //trackViewModel?.syncLocalDatabaseAndRemoteDatabase()
                     }
                 }
             }, 0, trackingIntervalMillis)

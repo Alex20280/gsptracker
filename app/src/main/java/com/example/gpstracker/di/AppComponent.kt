@@ -8,7 +8,13 @@ import com.example.gpstracker.ui.track.TrackFragment
 import dagger.Component
 import javax.inject.Singleton
 
-@Component(modules = [AppModule::class, ViewModelModule::class, FirebaseRegistrationModule::class, LocationServiceModule::class, RoomDatabaseModule::class])
+@Component(modules = [
+    AppModule::class,
+    ViewModelModule::class,
+    FirebaseRegistrationModule::class,
+    LocationServiceModule::class,
+    RoomDatabaseModule::class,
+    WorkManagerModule::class])
 @Singleton
 interface AppComponent {
     fun inject(mainActivity: MainActivity?)

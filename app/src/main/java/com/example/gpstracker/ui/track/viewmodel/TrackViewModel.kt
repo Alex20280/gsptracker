@@ -7,24 +7,31 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import com.example.gpstracker.roomdb.LocationModel
 import com.example.gpstracker.roomdb.LocationRepository
 import com.example.gpstracker.ui.track.TrackerState
-import com.example.gpstracker.usecase.LocationServiceUseCase
+import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
+import com.example.gpstracker.usecase.LocationTrackerUseCase
+import com.example.gpstracker.usecase.SyncDatabaseUseCase
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.Timer
-import java.util.TimerTask
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
-    private val locationServiceUseCase: LocationServiceUseCase,
+    private val locationServiceUseCase: FirebaseDatabaseUseCase,
     private val firebaseDatabase: DatabaseReference,
     private val applicationContext: Context,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
+    private val locationTrackerUseCase: LocationTrackerUseCase,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
     val _stateLiveData = MutableLiveData<TrackerState>()
@@ -36,9 +43,9 @@ class TrackViewModel @Inject constructor(
         _stateLiveData.value = TrackerState.OFF
     }
 
-    fun startTracking() {
+    fun saveLocation() {
         viewModelScope.launch {
-            locationServiceUseCase.startLocationUpdates()
+            locationServiceUseCase.saveLocation()
         }
     }
 
@@ -57,7 +64,7 @@ class TrackViewModel @Inject constructor(
     }
 
     fun saveToRoomDatabase() {
-        locationServiceUseCase.getCurrentLocation { locationData ->
+        locationTrackerUseCase.getCurrentLocation { locationData ->
             if (locationData != null) {
                 val timestamp = System.currentTimeMillis()
                 val locationModel = LocationModel(
@@ -80,6 +87,18 @@ class TrackViewModel @Inject constructor(
         val date = Date(timestamp)
         val dateFormat = SimpleDateFormat("HH:mm dd MMM yyyy", Locale.getDefault())
         return dateFormat.format(date)
+    }
+
+    fun syncLocalDatabaseAndRemoteDatabase(){
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val syncDataRequest = OneTimeWorkRequest.Builder(SyncDatabaseUseCase::class.java)
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueue(syncDataRequest)
     }
 
 }

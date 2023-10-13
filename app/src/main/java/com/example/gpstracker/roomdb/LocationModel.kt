@@ -15,6 +15,5 @@ data class LocationModel(
     @ColumnInfo(name = "timestamp")
     val timestamp: String,
     @ColumnInfo(name = "isSynchronized")
-    val isSynchronized: Boolean = false
-    //userid
+    var isSynchronized: Boolean = false
 )

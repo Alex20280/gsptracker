@@ -3,9 +3,6 @@ package com.example.gpstracker.roomdb
 import com.example.gpstracker.roomdb.dao.LocationDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 class LocationRepositoryImpl @Inject constructor(
@@ -17,31 +14,16 @@ class LocationRepositoryImpl @Inject constructor(
             locationDao.insertLocation(location)
         }
     }
-        //locationDao.insertLocation(location)
 
-/*
-    override suspend fun getGpsLocation(location: LocationModel) {
-        locationDao.getAllLocations()
-    }*/
-}
+    override suspend fun getUnsynchronizedLocations(): List<LocationModel> {
+        return withContext(Dispatchers.IO){
+            locationDao.getUnsynchronizedLocations()
+        }
+    }
 
-
-/*
-fun saveLocation(locationData: LocationData) {
-    viewModelScope.launch {
-        val timestamp = System.currentTimeMillis()
-        val locationEntity = LocationModel(
-            latitude = locationData.latitude,
-            longitude = locationData.longitude,
-            timestamp = formatTimestamp(timestamp),
-            isSynchronized = false
-        )
-        locationRepository.saveGpsLocation(locationEntity)
+    override suspend fun markLocationAsSynchronizedBasedOnId(id: Long) {
+        withContext(Dispatchers.IO){
+            locationDao.markAsSynchronized(id)
+        }
     }
 }
-
-private fun formatTimestamp(timestamp: Long): String {
-    val date = Date(timestamp)
-    val dateFormat = SimpleDateFormat("HH:mm dd MMM yyyy", Locale.getDefault())
-    return dateFormat.format(date)
-}*/

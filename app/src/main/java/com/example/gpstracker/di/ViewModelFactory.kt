@@ -3,7 +3,7 @@ package com.example.gpstracker.di
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.gpstracker.roomdb.LocationRepository
+import androidx.work.WorkManager
 import com.example.gpstracker.roomdb.LocationRepositoryImpl
 import com.example.gpstracker.roomdb.dao.LocationDao
 import com.example.gpstracker.ui.forgetpassword.viewmodel.ForgetPasswordViewModel
@@ -11,7 +11,8 @@ import com.example.gpstracker.ui.signin.viewmodel.SignInViewModel
 import com.example.gpstracker.ui.signup.viewmodel.SignUpViewModel
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
 import com.example.gpstracker.usecase.FirebaseAuthenticationUseCase
-import com.example.gpstracker.usecase.LocationServiceUseCase
+import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
+import com.example.gpstracker.usecase.LocationTrackerUseCase
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -33,7 +34,8 @@ class ViewModelFactory @Inject constructor(
     private val viewModels: MutableMap<Class<out ViewModel>,
             Provider<ViewModel>>,
     private val context: Context,
-    private val locationDao: LocationDao
+    private val locationDao: LocationDao,
+    private val workManager: WorkManager
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -57,12 +59,16 @@ class ViewModelFactory @Inject constructor(
 
             modelClass.isAssignableFrom(TrackViewModel::class.java) -> {
                 return TrackViewModel(
-                    locationServiceUseCase = LocationServiceUseCase(
+                    locationServiceUseCase = FirebaseDatabaseUseCase(
                         fusedLocationClient = fusedLocationProviderClient,
                         database = databaseReference
                     ), firebaseDatabase = databaseReference,
                     applicationContext = context,
-                    locationRepository = LocationRepositoryImpl(locationDao)
+                    locationRepository = LocationRepositoryImpl(locationDao),
+                    locationTrackerUseCase = LocationTrackerUseCase(
+                        fusedLocationClient = fusedLocationProviderClient
+                    ),
+                    workManager = workManager
                 ) as T
             }
 

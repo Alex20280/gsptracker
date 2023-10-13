@@ -8,12 +8,8 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
-import com.example.gpstracker.utils.TrackerState
 import android.graphics.Canvas
 import android.graphics.RectF
-import android.widget.LinearLayout
-import android.widget.ProgressBar
-import android.widget.RelativeLayout.CENTER_IN_PARENT
 import com.example.gpstracker.R
 
 class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, attrs) {

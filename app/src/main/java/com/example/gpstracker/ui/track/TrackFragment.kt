@@ -15,7 +15,6 @@ import com.example.gpstracker.app.App
 import com.example.gpstracker.databinding.FragmentTrackBinding
 import com.example.gpstracker.di.ViewModelFactory
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
-import com.example.gpstracker.utils.TrackerState
 import java.util.Timer
 import java.util.TimerTask
 import javax.inject.Inject
@@ -29,7 +28,7 @@ class TrackFragment : Fragment() {
 
     private var isTracking = false
 
-    val timer = Timer()
+    private var timer: Timer? = null
 
     @JvmField
     @Inject
@@ -51,9 +50,31 @@ class TrackFragment : Fragment() {
 
         viewModelInstanciation()
         startButtonClicked()
+        //observeTrackState()
 
         return binding.root
     }
+
+/*    private fun observeTrackState() {
+        trackViewModel?.getStateLiveData()?.observe(viewLifecycleOwner, { state ->
+            when (state) {
+                TrackerState.ON -> {
+                    // Handle UI when state is On
+                    switchToOnState()
+                }
+
+                TrackerState.OFF -> {
+                    // Handle UI when state is Off
+                    switchToOffState()
+                }
+
+                TrackerState.DISCONNECTED -> {
+                    // Handle UI when state is Disconnected
+                    switchToDisconnectedState()
+                }
+            }
+        })
+    }*/
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -89,46 +110,52 @@ class TrackFragment : Fragment() {
         }
     }
 
+
     private fun startButtonClicked() {
         binding.startButton.setOnClickListener {
-            val isInternetConnected = trackViewModel?.isInternetConnected()
-            val isFirebaseAvailable = trackViewModel?.isFirebaseDatabaseAvailable()
-
-            if (isInternetConnected == true && isFirebaseAvailable == true) {
-                // Internet is available, and Firebase is available
-                if (!isTracking) {
-                    isTracking = true
-                    //trackViewModel?.startTracking()
-                    switchToOffState()
-                    buttonIsDisabled()
-                    startTrackingPeriodically()
-                } else {
-                    // If already tracking, you can stop it here if needed
-                    stopTracking()  //TODO
-                }
+            if (!isTracking) {
+                isTracking = true
+                startTrackingPeriodically()
+                switchToOnState()
+                buttonIsDisabled()
+                // Handle UI when tracking is started
             } else {
-                trackViewModel?.saveToRoomDatabase()
+                isTracking = false
+                switchToOffState()
+                buttonIsEnabled()
+                stopTrackingPeriodically()
+                // Handle UI when tracking is stopped
             }
         }
     }
 
 
     private fun startTrackingPeriodically() {
-        // Schedule tracking to occur every 10 minutes (600,000 milliseconds)
-        val trackingIntervalMillis = 1000L//600000L  //TODO
-        timer.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                trackViewModel?.startTracking()
-            }
-        }, 0, trackingIntervalMillis)
+        if (timer == null) {
+            timer = Timer()
+            val trackingIntervalMillis = 10000L//600000L  // 10 minutes
+            timer?.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    val isInternetConnected = trackViewModel?.isInternetConnected()
+                    val isFirebaseConnected = trackViewModel?.isFirebaseDatabaseAvailable()
+
+                    if (isInternetConnected == true || isFirebaseConnected == true) {
+                        // At least one of the conditions is true (internet or Firebase available)
+                        trackViewModel?.startTracking()
+                    } else {
+                        // Both conditions are false (neither internet nor Firebase available)
+                        buttonIsEnabled()
+                        switchToDisconnectedState()
+                        //stopTrackingPeriodically()
+                    }
+                }
+            }, 0, trackingIntervalMillis)
+        }
     }
 
-    private fun stopTracking() {
-        // Stop the tracking process and timer if needed
-        // You can add logic here to stop location updates
-        isTracking = false
-        // Cancel the timer if it's no longer needed
-        timer.cancel()
+    private fun stopTrackingPeriodically() {
+        timer?.cancel()
+        timer = null
     }
 
     private fun viewModelInstanciation() {
@@ -139,12 +166,12 @@ class TrackFragment : Fragment() {
 
     private fun switchToOnState() {
         binding.statefulCircleView.setState(TrackerState.ON)
-        binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.light_grey))
+        binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.colorAccent))
     }
 
     private fun switchToOffState() {
         binding.statefulCircleView.setState(TrackerState.OFF)
-        binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.colorAccent))
+        binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.light_grey))
     }
 
     private fun switchToDisconnectedState() {

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,14 +34,13 @@ class TrackFragment : Fragment() {
     @JvmField
     @Inject
     var trackViewModel: TrackViewModel? = null
-    private val LOCATION_PERMISSION_REQUEST_CODE = 100 //123
+    private val LOCATION_PERMISSION_REQUEST_CODE = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestLocationPermission()
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,31 +50,34 @@ class TrackFragment : Fragment() {
 
         viewModelInstanciation()
         startButtonClicked()
-        //observeTrackState()
+        observeTrackState()
 
         return binding.root
     }
 
-/*    private fun observeTrackState() {
-        trackViewModel?.getStateLiveData()?.observe(viewLifecycleOwner, { state ->
+    private fun observeTrackState() {
+        trackViewModel?.getStateLiveData()?.observe(viewLifecycleOwner) { state ->
             when (state) {
                 TrackerState.ON -> {
-                    // Handle UI when state is On
-                    switchToOnState()
+                    activeCustomView()
+                    buttonIsDisabled()
+                    startTrackingPeriodically()
                 }
 
                 TrackerState.OFF -> {
-                    // Handle UI when state is Off
-                    switchToOffState()
+                    inactiveCustomView()
+                    buttonIsEnabled()
+                    stopTrackingPeriodically()
                 }
 
                 TrackerState.DISCONNECTED -> {
-                    // Handle UI when state is Disconnected
-                    switchToDisconnectedState()
+                    disconnectedCustomView()
+                    buttonIsEnabled()
+                    stopTrackingPeriodically()
                 }
             }
-        })
-    }*/
+        }
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -83,13 +86,7 @@ class TrackFragment : Fragment() {
     ) {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission is granted; you can proceed with location-related tasks
-                //trackViewModel?.startLocationUpdates() //TODO
                 //TODO
-
-            } else {
-                // Permission denied; handle accordingly
-                // You may want to show a message to the user or disable location-related features
             }
         }
     }
@@ -115,16 +112,10 @@ class TrackFragment : Fragment() {
         binding.startButton.setOnClickListener {
             if (!isTracking) {
                 isTracking = true
-                startTrackingPeriodically()
-                switchToOnState()
-                buttonIsDisabled()
-                // Handle UI when tracking is started
+                trackViewModel?._stateLiveData?.value = TrackerState.ON
             } else {
                 isTracking = false
-                switchToOffState()
-                buttonIsEnabled()
-                stopTrackingPeriodically()
-                // Handle UI when tracking is stopped
+                trackViewModel?._stateLiveData?.value = TrackerState.OFF
             }
         }
     }
@@ -138,15 +129,11 @@ class TrackFragment : Fragment() {
                 override fun run() {
                     val isInternetConnected = trackViewModel?.isInternetConnected()
                     val isFirebaseConnected = trackViewModel?.isFirebaseDatabaseAvailable()
-
-                    if (isInternetConnected == true || isFirebaseConnected == true) {
-                        // At least one of the conditions is true (internet or Firebase available)
+                    if (isInternetConnected == true && isFirebaseConnected == true) {
                         trackViewModel?.startTracking()
                     } else {
-                        // Both conditions are false (neither internet nor Firebase available)
-                        buttonIsEnabled()
-                        switchToDisconnectedState()
-                        //stopTrackingPeriodically()
+                        trackViewModel?._stateLiveData?.postValue(TrackerState.DISCONNECTED)
+                        trackViewModel?.saveToRoomDatabase()
                     }
                 }
             }, 0, trackingIntervalMillis)
@@ -164,19 +151,19 @@ class TrackFragment : Fragment() {
             ViewModelProvider(requireActivity(), viewModelFactory).get(TrackViewModel::class.java)
     }
 
-    private fun switchToOnState() {
-        binding.statefulCircleView.setState(TrackerState.ON)
+    private fun activeCustomView() {
         binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.colorAccent))
+        binding.statefulCircleView.setState(TrackerState.ON)
     }
 
-    private fun switchToOffState() {
-        binding.statefulCircleView.setState(TrackerState.OFF)
+    private fun inactiveCustomView() {
         binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.light_grey))
+        binding.statefulCircleView.setState(TrackerState.OFF)
     }
 
-    private fun switchToDisconnectedState() {
-        binding.statefulCircleView.setState(TrackerState.DISCONNECTED)
+    private fun disconnectedCustomView() {
         binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.red))
+        binding.statefulCircleView.setState(TrackerState.DISCONNECTED)
     }
 
     private fun buttonIsDisabled() {
@@ -191,6 +178,4 @@ class TrackFragment : Fragment() {
         binding.startButton.backgroundTintList = ColorStateList.valueOf(colorWhite)
         binding.startButton.setText("Start")
     }
-
-
 }

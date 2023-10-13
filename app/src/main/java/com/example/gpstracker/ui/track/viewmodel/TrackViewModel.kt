@@ -27,33 +27,13 @@ class TrackViewModel @Inject constructor(
     private val locationRepository: LocationRepository
 ) : ViewModel() {
 
-    private val _stateLiveData = MutableLiveData<TrackerState>()
+    val _stateLiveData = MutableLiveData<TrackerState>()
     fun getStateLiveData(): LiveData<TrackerState>{
         return _stateLiveData
     }
 
     init {
         _stateLiveData.value = TrackerState.OFF
-    }
-
-
-    fun updateState(state: TrackerState) {
-        _stateLiveData.value = state
-    }
-
-    fun checkInternetConnectionPeriodically() {
-        val timer = Timer()
-        timer.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                val isInternetConnected = isInternetConnected()
-                val isFirebaseConnected = isFirebaseDatabaseAvailable()
-                if (!isInternetConnected || !isFirebaseConnected) {
-                    _stateLiveData.postValue(TrackerState.DISCONNECTED)
-                } else {
-                    _stateLiveData.postValue(TrackerState.ON)
-                }
-            }
-        }, 0, 5000)
     }
 
     fun startTracking() {
@@ -75,18 +55,6 @@ class TrackViewModel @Inject constructor(
     fun isFirebaseDatabaseAvailable(): Boolean {
         return firebaseDatabase != null
     }
-
-    /*    fun saveToRoomDatabase() {
-            locationServiceUseCase.getCurrentLocation { locationData ->
-                if (locationData != null) {
-                    viewModelScope.launch {
-                        roomDatabase.saveLocation(locationData)
-                    }
-                } else {
-                    // Handle the case where location data is not available
-                }
-            }
-        }*/
 
     fun saveToRoomDatabase() {
         locationServiceUseCase.getCurrentLocation { locationData ->

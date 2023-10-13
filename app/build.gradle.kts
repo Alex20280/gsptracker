@@ -141,4 +141,9 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
 
+    //WorkManager
+    implementation("androidx.work:work-runtime:2.7.0")
+
+
+
 }

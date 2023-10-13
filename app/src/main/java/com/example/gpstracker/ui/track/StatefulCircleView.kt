@@ -13,7 +13,7 @@ import android.graphics.RectF
 import com.example.gpstracker.R
 
 class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, attrs) {
-    private var state = TrackerState.OFF // Default state is OFF
+    private var state = TrackerState.OFF
 
     private val circlePaint = Paint()
     private val exclamationPaint = Paint()
@@ -42,14 +42,6 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
         invalidate() // Redraw the view to reflect the new color
     }
 
-    fun startProgressBarSpin() {
-
-    }
-
-    fun stopProgressBarSpin() {
-
-    }
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
@@ -64,22 +56,20 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
 
         when (state) {
             TrackerState.OFF -> {
-                // Draw the circle (3 times smaller)
                 val smallerRadius = radius / 5f
+                circlePaint.color = resources.getColor(R.color.light_grey)
                 canvas.drawCircle(centerX, centerY, smallerRadius, circlePaint)
             }
+
             TrackerState.ON -> {
-                // Draw the circle in yellow (3 times smaller)
                 val smallerRadius = radius / 5f
                 circlePaint.color = resources.getColor(R.color.colorAccent)
                 canvas.drawCircle(centerX, centerY, smallerRadius, circlePaint)
-
             }
+
             TrackerState.DISCONNECTED -> {
-                // Draw a red exclamation mark in the center for the ERROR state
                 val exclamationSize = radius / 4 // Make it 3 times smaller
 
-                // Draw the vertical line of the exclamation mark
                 val lineStartX = centerX
                 val lineStartY = centerY + exclamationSize * 0.8f
                 val lineEndX = centerX
@@ -93,7 +83,6 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
 
                 // Restore the paint style to stroke for any future drawing
                 exclamationPaint.style = Paint.Style.STROKE
-
             }
         }
 

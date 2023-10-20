@@ -19,7 +19,6 @@ import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.databinding.FragmentTrackBinding
 import com.example.gpstracker.di.ViewModelFactory
-import com.example.gpstracker.ui.track.screens.customview.CircleView
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
 import java.util.Timer
 import java.util.TimerTask
@@ -74,8 +73,7 @@ class TrackFragment : Fragment() {
         valueAnimator.duration = 1000
         valueAnimator.repeatCount = ValueAnimator.INFINITE
         valueAnimator.addUpdateListener { animation ->
-            Log.d("Anim", animation.animatedValue.toString())
-            binding.circleView.setValue(animation.animatedValue as Int)
+            binding.statefulCircleView.setValue(animation.animatedValue as Int)
         }
     }
 
@@ -101,7 +99,7 @@ class TrackFragment : Fragment() {
                     trackInternetAvailability()
                     setTitleOn()
                     startCircleAnimation()
-                    changeProgressBarState(TrackerState.ON)
+                   // changeProgressBarState(TrackerState.ON)
                 }
 
                 TrackerState.OFF -> {
@@ -110,7 +108,7 @@ class TrackFragment : Fragment() {
                     stopTrackInternetAvailability()
                     stopTrackLocation()
                     setTitleOff()
-                    changeProgressBarState(TrackerState.OFF)
+                    //changeProgressBarState(TrackerState.OFF)
                     stopCircleAnimation()
                 }
 
@@ -121,7 +119,7 @@ class TrackFragment : Fragment() {
                     startWorkManager() //
                     setTitleDisconnected()
 
-                    changeProgressBarState(TrackerState.DISCONNECTED)
+                    //changeProgressBarState(TrackerState.DISCONNECTED)
                }
             }
         }
@@ -193,9 +191,7 @@ class TrackFragment : Fragment() {
                         trackViewModel?.saveLocation()
                     } else {
                         trackViewModel?.saveToRoomDatabase()
-
                     }
-
                 }
             }, 0, trackingIntervalMillis)
         }
@@ -238,28 +234,17 @@ class TrackFragment : Fragment() {
     }
 
     private fun changeCustomViewState(state: TrackerState) {
-        //binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.colorAccent))
         binding.statefulCircleView.setState(state)
     }
-
- /*   private fun inactiveCustomView() {
-       // binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.light_grey))
-        binding.statefulCircleView.setState(TrackerState.OFF)
-    }
-
-    private fun disconnectedCustomView() {
-       // binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.red))
-        binding.statefulCircleView.setState(TrackerState.DISCONNECTED)
-    }*/
 
     private fun buttonIsDisabled() {
         binding.startButton.invalidate()
         binding.startButton.setText(getString(R.string.stop))
     }
 
-    private fun changeProgressBarState(state: TrackerState){
-        binding.circleView.setState(state)
-    }
+/*    private fun changeProgressBarState(state: TrackerState){
+        binding.statefulCircleView.setProgressState(state)
+    }*/
 
     private fun buttonIsEnabled() {
         val colorWhite = ContextCompat.getColor(requireContext(), R.color.colorAccent)

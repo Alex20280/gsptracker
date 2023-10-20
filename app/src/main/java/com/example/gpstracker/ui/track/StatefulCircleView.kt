@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 import android.graphics.Canvas
@@ -18,17 +17,24 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
     private val exclamationPaint = Paint()
     private val image: Bitmap
 
+    private var animValue: Int = 0
+    private val strokeWidth = 35
+
     init {
-        circlePaint.color = resources.getColor(R.color.grey) // Default color for OFF state
-        exclamationPaint.color = Color.RED // Color for ERROR state
+        circlePaint.color = resources.getColor(R.color.grey)
+        exclamationPaint.color = Color.RED
         exclamationPaint.style = Paint.Style.STROKE
         exclamationPaint.strokeWidth = 10f
-
         image = BitmapFactory.decodeResource(resources, R.drawable.track_point)
     }
 
     fun setState(newState: TrackerState) {
         state = newState
+        invalidate()
+    }
+
+    fun setValue(animatedValue: Int) {
+        animValue = animatedValue
         invalidate()
     }
 
@@ -44,17 +50,37 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
         val imageTop = centerY - image.height / 2
         canvas.drawBitmap(image, imageLeft, imageTop, null)
 
+        val paint = Paint()
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = strokeWidth.toFloat()
+
+        val rectF = RectF()
+        rectF.set(
+            strokeWidth.toFloat(),
+            strokeWidth.toFloat(),
+            (width - strokeWidth).toFloat(),
+            (height - strokeWidth).toFloat()
+        )
+
         when (state) {
             TrackerState.OFF -> {
                 val smallerRadius = radius / 5f
                 circlePaint.color = resources.getColor(R.color.light_grey)
                 canvas.drawCircle(centerX, centerY, smallerRadius, circlePaint)
+
+                //progressBar
+                paint.color = context.resources.getColor(R.color.light_grey)
+                canvas.drawArc(rectF, 0f, 360f, false, paint)
             }
 
             TrackerState.ON -> {
                 val smallerRadius = radius / 5f
                 circlePaint.color = resources.getColor(R.color.colorAccent)
                 canvas.drawCircle(centerX, centerY, smallerRadius, circlePaint)
+
+                //progressBar
+                paint.color = context.resources.getColor(R.color.colorAccent)
+                canvas.drawArc(rectF, animValue.toFloat(), 80f, false, paint)
             }
 
             TrackerState.DISCONNECTED -> {
@@ -78,6 +104,10 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
 
                 // Restore the paint style to stroke for any future drawing
                 exclamationPaint.style = Paint.Style.STROKE
+
+                //progressBar
+                paint.color = context.resources.getColor(R.color.red)
+                canvas.drawArc(rectF, 0f, 360f, false, paint)
             }
         }
     }

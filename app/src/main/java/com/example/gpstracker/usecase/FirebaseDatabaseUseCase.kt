@@ -2,6 +2,7 @@ package com.example.gpstracker.usecase
 
 import android.annotation.SuppressLint
 import android.location.Location
+import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.firebase.database.DatabaseReference
 import com.example.gpstracker.ui.track.LocationData

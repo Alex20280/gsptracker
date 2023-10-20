@@ -11,7 +11,7 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class LocationServiceModule {
+object LocationServiceModule {
 
     @Provides
     fun provideLocationServiceUseCase(fusedLocationClient: FusedLocationProviderClient, database: DatabaseReference): FirebaseDatabaseUseCase {

@@ -13,4 +13,7 @@
     <string name="register">Register</string>
     <string name="invalid_password_warning">Password must be at least 8 characters, should have digits, latters, special character and at least 1 uppercase letter</string>
     <string name="invalid_email_warning">Invalid email</string>
+    <string name="tracker_is_off">TRACKER IS OFF</string>
+    <string name="gps_is_off">GPS IS OFF</string>
+    <string name="tracker_collects_locations">TRACKER COLLECTS LOCATIONS</string>
 </resources>

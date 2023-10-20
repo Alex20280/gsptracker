@@ -6,7 +6,7 @@ import dagger.Module
 import dagger.Provides
 
 @Module
-class FirebaseRegistrationModule {
+object FirebaseRegistrationModule {
     @Provides
     fun provideFirebaseRegistrationUseCase(auth: FirebaseAuth): FirebaseAuthenticationUseCase {
         return FirebaseAuthenticationUseCase(auth)

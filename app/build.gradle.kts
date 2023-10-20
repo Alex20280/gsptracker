@@ -143,7 +143,7 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
 
     //WorkManager
-    implementation("androidx.work:work-runtime:2.7.0")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
 
 
 

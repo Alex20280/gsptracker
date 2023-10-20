@@ -85,7 +85,7 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
                 exclamationPaint.style = Paint.Style.STROKE
             }
         }
-
+/*
         // Draw the custom circle progress bar in the middle
         val progressBarRadius = radius -20  // Adjust the size as needed (smaller radius)
         val progressBarRect = RectF(
@@ -98,6 +98,6 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
         progressBarPaint.style = Paint.Style.STROKE
         progressBarPaint.color = progressBarColor
                 progressBarPaint.strokeWidth = 30f // Adjust the progress bar width as needed
-        canvas.drawArc(progressBarRect, 0f, 360f, false, progressBarPaint)
+        canvas.drawArc(progressBarRect, 0f, 360f, false, progressBarPaint)*/
     }
 }

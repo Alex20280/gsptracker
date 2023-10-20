@@ -10,10 +10,12 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.firebase.database.DatabaseReference
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 @Module
 object WorkManagerModule {
 
+    @Singleton
     @Provides
     fun provideWorkManager(context: Context): WorkManager {
         return WorkManager.getInstance(context)

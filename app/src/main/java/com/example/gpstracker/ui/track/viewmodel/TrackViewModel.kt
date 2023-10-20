@@ -3,15 +3,21 @@ package com.example.gpstracker.ui.track.viewmodel
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.workDataOf
 import com.example.gpstracker.roomdb.LocationModel
 import com.example.gpstracker.roomdb.LocationRepository
 import com.example.gpstracker.ui.track.TrackerState
@@ -23,6 +29,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
@@ -90,14 +97,15 @@ class TrackViewModel @Inject constructor(
     }
 
     fun syncLocalDatabaseAndRemoteDatabase(){
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+       Log.d("MyworkManagerRun", "somesuccess")
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-        val syncDataRequest = OneTimeWorkRequest.Builder(SyncDatabaseUseCase::class.java)
+        val syncDataRequest: WorkRequest = OneTimeWorkRequestBuilder<SyncDatabaseUseCase>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setConstraints(constraints)
-            .build()
+                .build()
 
+        //WorkManager.getInstance(applicationContext).enqueue(syncDataRequest)
         workManager.enqueue(syncDataRequest)
     }
 

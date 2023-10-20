@@ -2,25 +2,18 @@ package com.example.gpstracker.ui.track.screens.customview
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import com.example.gpstracker.R
-import com.google.firebase.database.annotations.Nullable
+import com.example.gpstracker.ui.track.TrackerState
 
 
 class CircleView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var animValue: Int = 0
-    private var currentState: Int = STATE_GreyCircle // Default state
+    private var currentState: TrackerState = TrackerState.OFF
     private val strokeWidth = 35
-
-    companion object {
-        const val STATE_GreyCircle = 1
-        const val STATE_RedCircle = 2
-        const val STATE_Spinning = 3
-    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -38,23 +31,22 @@ class CircleView(context: Context, attrs: AttributeSet) : View(context, attrs) {
         )
 
         when (currentState) {
-            STATE_GreyCircle -> {
+            TrackerState.OFF -> {
                 paint.color = context.resources.getColor(R.color.light_grey)
                 canvas.drawArc(rectF, 0f, 360f, false, paint)
             }
-            STATE_RedCircle -> {
+            TrackerState.DISCONNECTED -> {
                 paint.color = context.resources.getColor(R.color.red)
                 canvas.drawArc(rectF, 0f, 360f, false, paint)
             }
-            STATE_Spinning -> {
-                // Draw spinning circle with colorAccent
+            TrackerState.ON -> {
                 paint.color = context.resources.getColor(R.color.colorAccent)
                 canvas.drawArc(rectF, animValue.toFloat(), 80f, false, paint)
             }
         }
     }
 
-    fun setState(newState: Int) {
+    fun setState(newState: TrackerState) {
         currentState = newState
         invalidate()
     }

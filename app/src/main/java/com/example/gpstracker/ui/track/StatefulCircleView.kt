@@ -14,13 +14,9 @@ import com.example.gpstracker.R
 
 class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var state = TrackerState.OFF
-
     private val circlePaint = Paint()
     private val exclamationPaint = Paint()
-    private val exclamationPath = Path()
     private val image: Bitmap
-    private var progressBarColor = resources.getColor(R.color.light_grey)
-    private var isProgressBarSpinning = false
 
     init {
         circlePaint.color = resources.getColor(R.color.grey) // Default color for OFF state
@@ -28,18 +24,12 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
         exclamationPaint.style = Paint.Style.STROKE
         exclamationPaint.strokeWidth = 10f
 
-        // Load the image from resources
         image = BitmapFactory.decodeResource(resources, R.drawable.track_point)
     }
 
     fun setState(newState: TrackerState) {
         state = newState
-        invalidate() // Redraw the view to reflect the new state
-    }
-
-    fun setProgressBarColor(color: Int) {
-        progressBarColor = color
-        invalidate() // Redraw the view to reflect the new color
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -79,25 +69,16 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
                 // Draw a slightly larger solid red circle as the point of the exclamation mark
                 val dotSize = exclamationSize * 0.3f
                 exclamationPaint.style = Paint.Style.FILL
-                canvas.drawCircle(centerX, centerY + exclamationSize * 1.2f, dotSize, exclamationPaint)
+                canvas.drawCircle(
+                    centerX,
+                    centerY + exclamationSize * 1.2f,
+                    dotSize,
+                    exclamationPaint
+                )
 
                 // Restore the paint style to stroke for any future drawing
                 exclamationPaint.style = Paint.Style.STROKE
             }
         }
-/*
-        // Draw the custom circle progress bar in the middle
-        val progressBarRadius = radius -20  // Adjust the size as needed (smaller radius)
-        val progressBarRect = RectF(
-            centerX - progressBarRadius,
-            centerY - progressBarRadius,
-            centerX + progressBarRadius,
-            centerY + progressBarRadius
-        )
-        val progressBarPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        progressBarPaint.style = Paint.Style.STROKE
-        progressBarPaint.color = progressBarColor
-                progressBarPaint.strokeWidth = 30f // Adjust the progress bar width as needed
-        canvas.drawArc(progressBarRect, 0f, 360f, false, progressBarPaint)*/
     }
 }

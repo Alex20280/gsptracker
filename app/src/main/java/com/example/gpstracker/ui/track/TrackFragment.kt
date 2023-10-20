@@ -66,17 +66,6 @@ class TrackFragment : Fragment() {
         observeTrackState()
         initAnimation()
 
-
-/*        valueAnimator.interpolator = LinearInterpolator()
-        valueAnimator.duration = 1000
-        valueAnimator.repeatCount = ValueAnimator.INFINITE
-        valueAnimator.addUpdateListener { animation ->
-            Log.d("Anim", animation.animatedValue.toString())
-            binding.circleView.setValue(animation.animatedValue as Int)
-        }*/
-        //alueAnimator.start()
-
-
         return binding.root
     }
 
@@ -106,45 +95,37 @@ class TrackFragment : Fragment() {
         trackViewModel?.getStateLiveData()?.observe(viewLifecycleOwner) { state ->
             when (state) {
                 TrackerState.ON -> {
-                    activeCustomView()
+                    changeCustomViewState(TrackerState.ON)
                     buttonIsDisabled()
                     startTrackLocation()
                     trackInternetAvailability()
                     setTitleOn()
-                    setProgressBarToYellow()
-
                     startCircleAnimation()
-                    binding.circleView.setState(3)
+                    changeProgressBarState(TrackerState.ON)
                 }
 
                 TrackerState.OFF -> {
-                    inactiveCustomView()
+                    changeCustomViewState(TrackerState.OFF)
                     buttonIsEnabled()
                     stopTrackInternetAvailability()
                     stopTrackLocation()
                     setTitleOff()
-                    setProgressBarToGrey()
-
-                    binding.circleView.setState(1)
+                    changeProgressBarState(TrackerState.OFF)
                     stopCircleAnimation()
                 }
 
                 TrackerState.DISCONNECTED -> {
-                    disconnectedCustomView()
+                    //disconnectedCustomView()
+                    changeCustomViewState(TrackerState.DISCONNECTED)
                     buttonIsEnabled()
                     startWorkManager() //
                     setTitleDisconnected()
-                    setProgressBarToRed()
 
-                    binding.circleView.setState(2)
+                    changeProgressBarState(TrackerState.DISCONNECTED)
                }
             }
         }
     }
-
-/*    private fun updateProgressBar() {
-        binding.myCustomProgressBar.setProgress(progress)
-    }*/
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -256,51 +237,34 @@ class TrackFragment : Fragment() {
             ViewModelProvider(requireActivity(), viewModelFactory).get(TrackViewModel::class.java)
     }
 
-    private fun activeCustomView() {
-        binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.colorAccent))
-        binding.statefulCircleView.setState(TrackerState.ON)
+    private fun changeCustomViewState(state: TrackerState) {
+        //binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.colorAccent))
+        binding.statefulCircleView.setState(state)
     }
 
-    private fun inactiveCustomView() {
-        binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.light_grey))
+ /*   private fun inactiveCustomView() {
+       // binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.light_grey))
         binding.statefulCircleView.setState(TrackerState.OFF)
     }
 
     private fun disconnectedCustomView() {
-        binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.red))
+       // binding.statefulCircleView.setProgressBarColor(resources.getColor(R.color.red))
         binding.statefulCircleView.setState(TrackerState.DISCONNECTED)
-    }
+    }*/
 
     private fun buttonIsDisabled() {
-        val colorWhite = ContextCompat.getColor(requireContext(), R.color.white)
-        //binding.startButton.background.setColorFilter(colorWhite, PorterDuff.Mode.SRC_ATOP)
         binding.startButton.invalidate()
-        binding.startButton.setText("Stop")
+        binding.startButton.setText(getString(R.string.stop))
     }
 
-    private fun setProgressBarToYellow() {
-        val color = resources.getColor(R.color.colorAccent)
-        //binding.progressBar.getIndeterminateDrawable().setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
-        //binding.progressBar.progress = 360
-    }
-
-    private fun setProgressBarToRed() {
-        val color = resources.getColor(R.color.red)
-       // binding.progressBar.getIndeterminateDrawable().setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
-
-    }
-
-    private fun setProgressBarToGrey() {
-        val color = resources.getColor(R.color.light_grey)
-        //binding.progressBar.getIndeterminateDrawable().setColorFilter(color, android.graphics.PorterDuff.Mode.SRC_IN);
-       // val progress = 50 // Change this value as needed
-        //binding.progressBar.setProgress(100)
+    private fun changeProgressBarState(state: TrackerState){
+        binding.circleView.setState(state)
     }
 
     private fun buttonIsEnabled() {
         val colorWhite = ContextCompat.getColor(requireContext(), R.color.colorAccent)
         binding.startButton.backgroundTintList = ColorStateList.valueOf(colorWhite)
-        binding.startButton.setText("Start")
+        binding.startButton.setText(getString(R.string.start))
     }
 
     private fun setTitleOn() {

@@ -16,4 +16,6 @@
     <string name="tracker_is_off">TRACKER IS OFF</string>
     <string name="gps_is_off">GPS IS OFF</string>
     <string name="tracker_collects_locations">TRACKER COLLECTS LOCATIONS</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 </resources>

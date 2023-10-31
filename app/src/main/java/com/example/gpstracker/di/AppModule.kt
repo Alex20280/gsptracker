@@ -29,5 +29,5 @@ class AppModule(private val application: App) {
     fun provideViewModelMap(): Map<Class<out ViewModel>, Provider<ViewModel>> {
         return mutableMapOf()
     }
-
 }
+

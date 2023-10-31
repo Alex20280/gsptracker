@@ -35,7 +35,8 @@ class TrackFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    private lateinit var binding: FragmentTrackBinding
+    private var _binding: FragmentTrackBinding? = null
+    private val binding get() = _binding!!
 
     private var isTracking = false
 
@@ -60,7 +61,7 @@ class TrackFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentTrackBinding.inflate(inflater, container, false)
+        _binding = FragmentTrackBinding.inflate(inflater, container, false)
 
         viewModelInstanciation()
         startButtonClicked()
@@ -68,6 +69,11 @@ class TrackFragment : Fragment() {
         initAnimation()
 
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun initAnimation() {

@@ -19,7 +19,8 @@ class ForgetPasswordFragment : BaseFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
 
-    private lateinit var binding: FragmentForgetPasswordBinding
+    private var _binding: FragmentForgetPasswordBinding? = null
+    private val binding get() = _binding!!
 
     @JvmField
     @Inject
@@ -35,12 +36,17 @@ class ForgetPasswordFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentForgetPasswordBinding.inflate(inflater, container, false)
+        _binding = FragmentForgetPasswordBinding.inflate(inflater, container, false)
 
         resetButtonClick()
         observePasswordResetResult()
 
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun observePasswordResetResult() {

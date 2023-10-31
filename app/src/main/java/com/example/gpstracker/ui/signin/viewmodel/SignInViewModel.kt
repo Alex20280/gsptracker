@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpstracker.network.RequestResult
+import com.example.gpstracker.prefs.UserPreferences
 import com.example.gpstracker.usecase.FirebaseAuthenticationUseCase
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
@@ -13,7 +14,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SignInViewModel @Inject constructor(
-    private val firebaseAuthenticationUseCase: FirebaseAuthenticationUseCase
+    private val firebaseAuthenticationUseCase: FirebaseAuthenticationUseCase,
+    private val userPreferences: UserPreferences,
 ): ViewModel() {
 
     private val signInResult = MutableLiveData<RequestResult<Task<AuthResult>>>()
@@ -33,6 +35,7 @@ class SignInViewModel @Inject constructor(
         when (response) {
             is RequestResult.Success -> {
                 signInResult.value = response
+                saveUserId(firebaseAuthenticationUseCase.getUserUd().toString())
             }
             is RequestResult.Error -> {
                 signInResult.postValue(RequestResult.Error(response.errorData, response.code))
@@ -43,6 +46,10 @@ class SignInViewModel @Inject constructor(
 
     fun isValidEmail(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    fun saveUserId(id: String) {
+        userPreferences.setUserId(id)
     }
 
     fun isValidPassword(password: String): Boolean {

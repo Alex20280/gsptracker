@@ -3,33 +3,27 @@ package com.example.gpstracker.ui.track.viewmodel
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.BackoffPolicy
 import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
-import androidx.work.workDataOf
+import com.example.gpstracker.prefs.UserPreferences
 import com.example.gpstracker.roomdb.LocationModel
 import com.example.gpstracker.roomdb.LocationRepository
 import com.example.gpstracker.ui.track.TrackerState
 import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
 import com.example.gpstracker.usecase.LocationTrackerUseCase
-import com.example.gpstracker.usecase.SyncDatabaseUseCase
+import com.example.gpstracker.usecase.workManager.CustomWorker
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
@@ -38,13 +32,19 @@ class TrackViewModel @Inject constructor(
     private val applicationContext: Context,
     private val locationRepository: LocationRepository,
     private val locationTrackerUseCase: LocationTrackerUseCase,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     val _stateLiveData = MutableLiveData<TrackerState>()
-    fun getStateLiveData(): LiveData<TrackerState>{
+    fun getStateLiveData(): LiveData<TrackerState> {
         return _stateLiveData
     }
+
+    fun getuid(): UserPreferences{
+       return userPreferences
+    }
+
 
     init {
         _stateLiveData.value = TrackerState.OFF
@@ -96,17 +96,41 @@ class TrackViewModel @Inject constructor(
         return dateFormat.format(date)
     }
 
-    fun syncLocalDatabaseAndRemoteDatabase(){
-       Log.d("MyworkManagerRun", "somesuccess")
-        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+    fun syncLocalDatabaseAndRemoteDatabase() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .build()
 
-        val syncDataRequest: WorkRequest = OneTimeWorkRequestBuilder<SyncDatabaseUseCase>()
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+        val syncDataRequest = OneTimeWorkRequest.Builder(CustomWorker::class.java)
             .setConstraints(constraints)
-                .build()
+            .build()
 
-        //WorkManager.getInstance(applicationContext).enqueue(syncDataRequest)
-        workManager.enqueue(syncDataRequest)
+        workManager.beginUniqueWork("Worker", ExistingWorkPolicy.REPLACE, syncDataRequest).enqueue()
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

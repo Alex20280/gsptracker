@@ -119,6 +119,4 @@ class SignInFragment : Fragment() {
             imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
-
-
 }

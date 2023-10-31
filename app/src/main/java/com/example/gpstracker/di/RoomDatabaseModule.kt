@@ -27,26 +27,4 @@ object RoomDatabaseModule {
     @Provides
     fun getUserPlanRepository(locationDao: LocationDao): LocationRepository = LocationRepositoryImpl(locationDao)
 
-
 }
-
-
-/*
-@Module
-class RoomDatabaseModule {
-
-    @Provides
-    fun provideAppDatabase(context: Context): LocationDatabase {
-        return Room.databaseBuilder(context, LocationDatabase::class.java, "gps_location_db").fallbackToDestructiveMigration().build()
-    }
-
-    @Provides
-    fun providePackageDao(appDatabase: LocationDatabase): LocationDao {
-        return appDatabase.locationDao
-    }
-
-    @Provides
-    fun getUserPlanRepository(locationDao: LocationDao): LocationRepository = LocationRepositoryImpl(locationDao)
-
-
-}*/

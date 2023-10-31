@@ -7,6 +7,7 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.firebase.database.DatabaseReference
 import com.example.gpstracker.ui.track.LocationData
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ServerValue
 import com.google.firebase.ktx.Firebase
 
 class FirebaseDatabaseUseCase(
@@ -25,7 +26,7 @@ class FirebaseDatabaseUseCase(
             }
     }
 
-    fun saveLocationFromRoomDatabase(latitude: Double, longitude: Double) : Boolean {
+    fun saveLocationFromRoomDatabase(latitude: Double, longitude: Double, ) : Boolean {
         saveLocationToFirebase(latitude, longitude)
         return true
     }
@@ -39,11 +40,18 @@ class FirebaseDatabaseUseCase(
         val locationEntry = userLocationsRef.push()
 
         // Set the latitude and longitude data for this location entry
-        val locationData = LocationData(latitude, longitude)
+        //val locationData = LocationData(latitude, longitude)
+
+        val locationData = HashMap<String, Any>()
+        locationData["latitude"] = latitude
+        locationData["longitude"] = longitude
+        locationData["timestamp"] = ServerValue.TIMESTAMP
         locationEntry.setValue(locationData)
+
+        Log.d("myLoccation", userId.toString() + latitude.toString() + "longitude" + longitude.toString() + "timestamp" + ServerValue.TIMESTAMP )
     }
 
-/*    @SuppressLint("MissingPermission")
+/*   @SuppressLint("MissingPermission")
     fun getCurrentLocation(callback: (LocationData?) -> Unit) {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->

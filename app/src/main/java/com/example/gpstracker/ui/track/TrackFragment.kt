@@ -12,9 +12,10 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.databinding.FragmentTrackBinding
@@ -36,9 +37,6 @@ class TrackFragment : Fragment() {
 
     private var internetTimer: Timer? = null
     private var dataSentTimer: Timer? = null
-
-    private var workManager: WorkManager? = null
-    private var workRequest: WorkRequest? = null
 
     val valueAnimator = ValueAnimator.ofInt(1, 360)
 
@@ -68,7 +66,7 @@ class TrackFragment : Fragment() {
         return binding.root
     }
 
-    private fun initAnimation(){
+    private fun initAnimation() {
         valueAnimator.interpolator = LinearInterpolator()
         valueAnimator.duration = 1000
         valueAnimator.repeatCount = ValueAnimator.INFINITE
@@ -77,11 +75,11 @@ class TrackFragment : Fragment() {
         }
     }
 
-    private fun startCircleAnimation(){
+    private fun startCircleAnimation() {
         valueAnimator.start()
     }
 
-    private fun stopCircleAnimation(){
+    private fun stopCircleAnimation() {
         valueAnimator.cancel()
     }
 
@@ -99,7 +97,6 @@ class TrackFragment : Fragment() {
                     trackInternetAvailability()
                     setTitleOn()
                     startCircleAnimation()
-                   // changeProgressBarState(TrackerState.ON)
                 }
 
                 TrackerState.OFF -> {
@@ -108,19 +105,15 @@ class TrackFragment : Fragment() {
                     stopTrackInternetAvailability()
                     stopTrackLocation()
                     setTitleOff()
-                    //changeProgressBarState(TrackerState.OFF)
                     stopCircleAnimation()
                 }
 
                 TrackerState.DISCONNECTED -> {
-                    //disconnectedCustomView()
                     changeCustomViewState(TrackerState.DISCONNECTED)
                     buttonIsEnabled()
                     startWorkManager() //
                     setTitleDisconnected()
-
-                    //changeProgressBarState(TrackerState.DISCONNECTED)
-               }
+                }
             }
         }
     }
@@ -156,22 +149,11 @@ class TrackFragment : Fragment() {
 
     private fun startButtonClicked() {
         binding.startButton.setOnClickListener {
- /*           Log.d("startButtonclick", "startButtonclick")
-
-            workManager = WorkManager.getInstance(requireContext())
-            val workRequest = PeriodicWorkRequest.Builder(
-                SyncDatabaseUseCase::class.java,
-                15, // Repeat interval in minutes
-                TimeUnit.MINUTES
-            )
-                .build()
-
-            workManager?.enqueue(workRequest)*/
+            Log.d("dscdcdscdvfdcd", "hyhyh")
+            Log.d("dscdcdscdvf", trackViewModel?.getuid()?.getUserId().toString())
             if (!isTracking) {
                 isTracking = true
                 trackViewModel?._stateLiveData?.value = TrackerState.ON
-
-
             } else {
                 isTracking = false
                 trackViewModel?._stateLiveData?.value = TrackerState.OFF
@@ -242,9 +224,9 @@ class TrackFragment : Fragment() {
         binding.startButton.setText(getString(R.string.stop))
     }
 
-/*    private fun changeProgressBarState(state: TrackerState){
-        binding.statefulCircleView.setProgressState(state)
-    }*/
+    /*    private fun changeProgressBarState(state: TrackerState){
+            binding.statefulCircleView.setProgressState(state)
+        }*/
 
     private fun buttonIsEnabled() {
         val colorWhite = ContextCompat.getColor(requireContext(), R.color.colorAccent)

@@ -5,6 +5,7 @@ import com.example.gpstracker.ui.forgetpassword.ForgetPasswordFragment
 import com.example.gpstracker.ui.signin.SignInFragment
 import com.example.gpstracker.ui.signup.SignUpFragment
 import com.example.gpstracker.ui.track.TrackFragment
+import com.example.gpstracker.usecase.workManager.CustomWorker
 import dagger.Component
 import javax.inject.Singleton
 
@@ -14,7 +15,8 @@ import javax.inject.Singleton
     FirebaseRegistrationModule::class,
     LocationServiceModule::class,
     RoomDatabaseModule::class,
-    WorkManagerModule::class])
+    WorkManagerModule::class,
+    UserPreferenceModule::class])
 @Singleton
 interface AppComponent {
     fun inject(mainActivity: MainActivity?)
@@ -22,4 +24,5 @@ interface AppComponent {
     fun inject(mapsFragment: SignInFragment?)
     fun inject(mapsFragment: SignUpFragment?)
     fun inject(mapsFragment: TrackFragment?)
+    fun inject(worker: CustomWorker?)
 }

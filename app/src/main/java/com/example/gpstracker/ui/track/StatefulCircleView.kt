@@ -41,14 +41,14 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val centerX = width / 2.2f
+        val centerX = width / 2f
         val centerY = height / 2f
         val radius = Math.min(centerX, centerY)
 
         // Draw the image in the center
-        val imageLeft = centerX - image.width / 2
+        val imageLeft = centerX - image.width / 2.4
         val imageTop = centerY - image.height / 2
-        canvas.drawBitmap(image, imageLeft, imageTop, null)
+        canvas.drawBitmap(image, imageLeft.toFloat(), imageTop, null)
 
         val paint = Paint()
         paint.style = Paint.Style.STROKE
@@ -65,8 +65,10 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
         when (state) {
             TrackerState.OFF -> {
                 val smallerRadius = radius / 5f
+                val circleX = centerX + radius / 20f // Move the circle to the right
+                val circleY = centerY - radius / 3f // Move the circle higher
                 circlePaint.color = resources.getColor(R.color.light_grey)
-                canvas.drawCircle(centerX, centerY, smallerRadius, circlePaint)
+                canvas.drawCircle(circleX, circleY, smallerRadius, circlePaint)
 
                 //progressBar
                 paint.color = context.resources.getColor(R.color.light_grey)
@@ -75,8 +77,10 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
 
             TrackerState.ON -> {
                 val smallerRadius = radius / 5f
+                val circleX = centerX + radius / 20f // Move the circle to the right
+                val circleY = centerY - radius / 3f // Move the circle higher
                 circlePaint.color = resources.getColor(R.color.colorAccent)
-                canvas.drawCircle(centerX, centerY, smallerRadius, circlePaint)
+                canvas.drawCircle(circleX, circleY, smallerRadius, circlePaint)
 
                 //progressBar
                 paint.color = context.resources.getColor(R.color.colorAccent)

@@ -8,6 +8,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.gpstracker.databinding.ActivityMainBinding
 import com.example.gpstracker.di.ViewModelFactory
+import com.google.firebase.FirebaseApp
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -23,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         initializeNavigation()
+
+        FirebaseApp.initializeApp(this)
     }
 
     private fun initializeNavigation() {

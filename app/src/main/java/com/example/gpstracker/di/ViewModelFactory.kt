@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.WorkManager
+import com.example.gpstracker.prefs.UserPreferences
 import com.example.gpstracker.roomdb.LocationRepositoryImpl
 import com.example.gpstracker.roomdb.dao.LocationDao
 import com.example.gpstracker.ui.forgetpassword.viewmodel.ForgetPasswordViewModel
@@ -48,13 +49,14 @@ class ViewModelFactory @Inject constructor(
             modelClass.isAssignableFrom(SignInViewModel::class.java) -> {
                 return SignInViewModel(
                     firebaseAuthenticationUseCase = FirebaseAuthenticationUseCase(
-                        auth = FirebaseAuth.getInstance()
-                    )
+                        auth = FirebaseAuth.getInstance()),
+                    userPreferences = UserPreferences(context),
                 ) as T
             }
 
             modelClass.isAssignableFrom(SignUpViewModel::class.java) -> {
-                return SignUpViewModel(registrationUseCase = FirebaseAuthenticationUseCase(auth = FirebaseAuth.getInstance())) as T
+                return SignUpViewModel(registrationUseCase = FirebaseAuthenticationUseCase(
+                    auth = FirebaseAuth.getInstance())) as T
             }
 
             modelClass.isAssignableFrom(TrackViewModel::class.java) -> {
@@ -68,12 +70,14 @@ class ViewModelFactory @Inject constructor(
                     locationTrackerUseCase = LocationTrackerUseCase(
                         fusedLocationClient = fusedLocationProviderClient
                     ),
-                    workManager = workManager
+                    workManager = workManager,
+                    userPreferences = UserPreferences(context)
                 ) as T
             }
 
             modelClass.isAssignableFrom(ForgetPasswordViewModel::class.java) -> {
-                return ForgetPasswordViewModel() as T
+                return ForgetPasswordViewModel(firebaseAuth = FirebaseAuthenticationUseCase(
+                    auth = FirebaseAuth.getInstance())) as T
             }
 
             else -> throw IllegalArgumentException("Unknown ViewModel class: $modelClass")

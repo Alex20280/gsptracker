@@ -21,6 +21,10 @@ import com.example.gpstracker.app.App
 import com.example.gpstracker.databinding.FragmentTrackBinding
 import com.example.gpstracker.di.ViewModelFactory
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.util.Timer
 import java.util.TimerTask
 import javax.inject.Inject
@@ -149,8 +153,9 @@ class TrackFragment : Fragment() {
 
     private fun startButtonClicked() {
         binding.startButton.setOnClickListener {
-            Log.d("dscdcdscdvfdcd", "hyhyh")
-            Log.d("dscdcdscdvf", trackViewModel?.getuid()?.getUserId().toString())
+            CoroutineScope(Dispatchers.IO).launch {
+                Log.d("dscdcdscdvf", trackViewModel?.getDataStoreUID().toString())
+            }
             if (!isTracking) {
                 isTracking = true
                 trackViewModel?._stateLiveData?.value = TrackerState.ON

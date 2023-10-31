@@ -1,9 +1,13 @@
 package com.example.gpstracker.base.extentions
 
+import android.content.Context
 import android.content.SharedPreferences
+import androidx.datastore.preferences.preferencesDataStore
 
 private const val DEFAULT_INT = -1
 private const val DEFAULT_STRING = ""
+
+val Context.myDataStore by preferencesDataStore(name = "login_details")
 
 fun SharedPreferences.saveString(key: String, value: String? = null) {
     this.edit().putString(key, value).apply()
@@ -27,3 +31,4 @@ fun SharedPreferences.getSaveBooleanPinKey(key:String):Boolean{
 fun SharedPreferences.saveInt(key: String, value: Int = DEFAULT_INT){
     this.edit().putInt(key, value).apply()
 }
+

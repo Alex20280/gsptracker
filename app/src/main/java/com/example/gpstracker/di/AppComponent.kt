@@ -16,7 +16,7 @@ import javax.inject.Singleton
     LocationServiceModule::class,
     RoomDatabaseModule::class,
     WorkManagerModule::class,
-    UserPreferenceModule::class])
+    DataPreferenceModule::class])
 @Singleton
 interface AppComponent {
     fun inject(mainActivity: MainActivity?)

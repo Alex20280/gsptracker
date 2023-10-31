@@ -12,6 +12,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import com.example.gpstracker.prefs.DataStorePreference
 import com.example.gpstracker.prefs.UserPreferences
 import com.example.gpstracker.roomdb.LocationModel
 import com.example.gpstracker.roomdb.LocationRepository
@@ -20,6 +21,7 @@ import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
 import com.example.gpstracker.usecase.LocationTrackerUseCase
 import com.example.gpstracker.usecase.workManager.CustomWorker
 import com.google.firebase.database.DatabaseReference
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -33,7 +35,7 @@ class TrackViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val locationTrackerUseCase: LocationTrackerUseCase,
     private val workManager: WorkManager,
-    private val userPreferences: UserPreferences
+    private val dataStorePreference: DataStorePreference
 ) : ViewModel() {
 
     val _stateLiveData = MutableLiveData<TrackerState>()
@@ -41,8 +43,10 @@ class TrackViewModel @Inject constructor(
         return _stateLiveData
     }
 
-    fun getuid(): UserPreferences{
-       return userPreferences
+    suspend fun getDataStoreUID(): String? {
+        return viewModelScope.async {
+            dataStorePreference.getData("UID")
+        }.await()
     }
 
 

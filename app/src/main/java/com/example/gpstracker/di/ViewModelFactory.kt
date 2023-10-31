@@ -1,9 +1,12 @@
 package com.example.gpstracker.di
 
 import android.content.Context
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.WorkManager
+import com.example.gpstracker.base.extentions.myDataStore
+import com.example.gpstracker.prefs.DataStorePreference
 import com.example.gpstracker.prefs.UserPreferences
 import com.example.gpstracker.roomdb.LocationRepositoryImpl
 import com.example.gpstracker.roomdb.dao.LocationDao
@@ -50,7 +53,7 @@ class ViewModelFactory @Inject constructor(
                 return SignInViewModel(
                     firebaseAuthenticationUseCase = FirebaseAuthenticationUseCase(
                         auth = FirebaseAuth.getInstance()),
-                    userPreferences = UserPreferences(context),
+                    dataStorePreference = DataStorePreference(context.myDataStore)
                 ) as T
             }
 
@@ -71,7 +74,7 @@ class ViewModelFactory @Inject constructor(
                         fusedLocationClient = fusedLocationProviderClient
                     ),
                     workManager = workManager,
-                    userPreferences = UserPreferences(context)
+                    dataStorePreference = DataStorePreference(context.myDataStore)
                 ) as T
             }
 

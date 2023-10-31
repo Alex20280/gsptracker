@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpstracker.network.RequestResult
+import com.example.gpstracker.prefs.DataStorePreference
 import com.example.gpstracker.prefs.UserPreferences
 import com.example.gpstracker.usecase.FirebaseAuthenticationUseCase
 import com.google.android.gms.tasks.Task
@@ -15,7 +16,7 @@ import javax.inject.Inject
 
 class SignInViewModel @Inject constructor(
     private val firebaseAuthenticationUseCase: FirebaseAuthenticationUseCase,
-    private val userPreferences: UserPreferences,
+    private val dataStorePreference: DataStorePreference
 ): ViewModel() {
 
     private val signInResult = MutableLiveData<RequestResult<Task<AuthResult>>>()
@@ -49,7 +50,10 @@ class SignInViewModel @Inject constructor(
     }
 
     fun saveUserId(id: String) {
-        userPreferences.setUserId(id)
+        viewModelScope.launch {
+            dataStorePreference.saveData("UID", id)
+        }
+
     }
 
     fun isValidPassword(password: String): Boolean {

@@ -12,22 +12,15 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.databinding.FragmentTrackBinding
 import com.example.gpstracker.di.ViewModelFactory
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
-import com.google.firebase.ktx.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.util.Timer
-import java.util.TimerTask
 import javax.inject.Inject
 
 
@@ -40,9 +33,6 @@ class TrackFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var isTracking = false
-
-    private var internetTimer: Timer? = null
-    private var dataSentTimer: Timer? = null
 
     val valueAnimator = ValueAnimator.ofInt(1, 360)
 
@@ -121,8 +111,8 @@ class TrackFragment : Fragment() {
 
                 TrackerState.DISCONNECTED -> {
                     changeCustomViewState(TrackerState.DISCONNECTED)
-                    buttonIsEnabled()
-                    startWorkManager() //
+                    buttonIsDisabled()
+                    startWorkManager()
                     setTitleDisconnected()
                 }
             }
@@ -174,51 +164,20 @@ class TrackFragment : Fragment() {
     }
 
     private fun startTrackLocation() {
-        if (dataSentTimer == null) {
-            dataSentTimer = Timer()
-            val trackingIntervalMillis = com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS // 10000L//   10000L// 10 sec
-            dataSentTimer?.scheduleAtFixedRate(object : TimerTask() {
-                override fun run() {
-                    val isInternetConnected = trackViewModel?.isInternetConnected()
-                    val isFirebaseConnected = trackViewModel?.isFirebaseDatabaseAvailable()
-                    if (isInternetConnected == true && isFirebaseConnected == true) {
-                        trackViewModel?.saveLocation()
-                    } else {
-                        trackViewModel?.saveToRoomDatabase()
-                    }
-                }
-            }, 0, trackingIntervalMillis)
-        }
+        trackViewModel?.startTracking()
     }
 
     private fun stopTrackLocation() {
-        dataSentTimer?.cancel()
-        dataSentTimer = null
+        trackViewModel?.stopTrackLocation()
     }
 
 
     private fun trackInternetAvailability() {
-        if (internetTimer == null) {
-            internetTimer = Timer()
-            val trackingIntervalMillis = 5000L//600000L  // 5 minutes
-            internetTimer?.scheduleAtFixedRate(object : TimerTask() {
-                override fun run() {
-                    val isInternetConnected = trackViewModel?.isInternetConnected()
-                    val isFirebaseConnected = trackViewModel?.isFirebaseDatabaseAvailable()
-                    val currentState = trackViewModel?.getStateLiveData()?.value
-                    if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true && isFirebaseConnected == true) {
-                        trackViewModel?._stateLiveData?.postValue(TrackerState.ON)
-                    } else if (currentState == TrackerState.ON && (isInternetConnected == false || isFirebaseConnected == false)) {
-                        trackViewModel?._stateLiveData?.postValue(TrackerState.DISCONNECTED)
-                    }
-                }
-            }, 0, trackingIntervalMillis)
-        }
+        trackViewModel?.startTrackInternetAvailability()
     }
 
     private fun stopTrackInternetAvailability() {
-        internetTimer?.cancel()
-        internetTimer = null
+        trackViewModel?.stopTrackInternetAvailability()
     }
 
     private fun viewModelInstanciation() {
@@ -235,10 +194,6 @@ class TrackFragment : Fragment() {
         binding.startButton.invalidate()
         binding.startButton.setText(getString(R.string.stop))
     }
-
-    /*    private fun changeProgressBarState(state: TrackerState){
-            binding.statefulCircleView.setProgressState(state)
-        }*/
 
     private fun buttonIsEnabled() {
         val colorWhite = ContextCompat.getColor(requireContext(), R.color.colorAccent)

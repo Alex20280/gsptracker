@@ -27,6 +27,8 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.Timer
+import java.util.TimerTask
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
@@ -38,6 +40,10 @@ class TrackViewModel @Inject constructor(
     private val workManager: WorkManager,
     private val dataStorePreference: DataStorePreference
 ) : ViewModel() {
+
+
+    private var internetTimer: Timer? = null
+    private var dataSentTimer: Timer? = null
 
     val _stateLiveData = MutableLiveData<TrackerState>()
     fun getStateLiveData(): LiveData<TrackerState> {
@@ -61,7 +67,56 @@ class TrackViewModel @Inject constructor(
         }
     }
 
-    fun isInternetConnected(): Boolean {
+
+    fun startTracking(){
+        if (dataSentTimer == null) {
+            dataSentTimer = Timer()
+            val trackingIntervalMillis =
+                com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS // 10000L//   10000L// 10 sec
+            dataSentTimer?.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    val isInternetConnected = isInternetConnected()
+                    val isFirebaseConnected = isFirebaseDatabaseAvailable()
+                    if (isInternetConnected == true && isFirebaseConnected == true) {
+                        saveLocation()
+                    } else {
+                        saveToRoomDatabase()
+                    }
+                }
+            }, 0, trackingIntervalMillis)
+        }
+    }
+
+    fun stopTrackLocation(){
+        dataSentTimer?.cancel()
+        dataSentTimer = null
+    }
+
+    fun stopTrackInternetAvailability(){
+        internetTimer?.cancel()
+        internetTimer = null
+    }
+
+    fun startTrackInternetAvailability(){
+        if (internetTimer == null) {
+            internetTimer = Timer()
+            val trackingIntervalMillis = 5000L//600000L  // 5 minutes
+            internetTimer?.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    val isInternetConnected = isInternetConnected()
+                    val isFirebaseConnected = isFirebaseDatabaseAvailable()
+                    val currentState = getStateLiveData().value
+                    if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true && isFirebaseConnected == true) {
+                        _stateLiveData.postValue(TrackerState.ON)
+                    } else if (currentState == TrackerState.ON && (isInternetConnected == false || isFirebaseConnected == false)) {
+                        _stateLiveData.postValue(TrackerState.DISCONNECTED)
+                    }
+                }
+            }, 0, trackingIntervalMillis)
+        }
+    }
+
+    private fun isInternetConnected(): Boolean {
         val connectivityManager =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkCapabilities = connectivityManager.activeNetwork ?: return false
@@ -71,11 +126,11 @@ class TrackViewModel @Inject constructor(
     }
 
 
-    fun isFirebaseDatabaseAvailable(): Boolean {
+    private fun isFirebaseDatabaseAvailable(): Boolean {
         return firebaseDatabase != null
     }
 
-    fun saveToRoomDatabase() {
+    private fun saveToRoomDatabase() {
         locationTrackerUseCase.getCurrentLocation { locationData ->
             if (locationData != null) {
                 val timestamp = System.currentTimeMillis()

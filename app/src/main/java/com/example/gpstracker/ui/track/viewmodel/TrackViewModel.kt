@@ -20,6 +20,7 @@ import com.example.gpstracker.ui.track.TrackerState
 import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
 import com.example.gpstracker.usecase.LocationTrackerUseCase
 import com.example.gpstracker.usecase.workManager.CustomWorker
+import com.google.firebase.database.BuildConfig
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch

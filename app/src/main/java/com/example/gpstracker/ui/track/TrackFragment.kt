@@ -21,6 +21,7 @@ import com.example.gpstracker.app.App
 import com.example.gpstracker.databinding.FragmentTrackBinding
 import com.example.gpstracker.di.ViewModelFactory
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
+import com.google.firebase.ktx.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -175,7 +176,7 @@ class TrackFragment : Fragment() {
     private fun startTrackLocation() {
         if (dataSentTimer == null) {
             dataSentTimer = Timer()
-            val trackingIntervalMillis = 10000L// 10 sec
+            val trackingIntervalMillis = com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS // 10000L//   10000L// 10 sec
             dataSentTimer?.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
                     val isInternetConnected = trackViewModel?.isInternetConnected()

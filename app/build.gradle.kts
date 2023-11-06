@@ -1,10 +1,12 @@
+val trackingIntervalDebug: String = "10000L"
+val trackingIntervalRelease: String = "600000L"
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id ("kotlin-kapt")
+    id("kotlin-kapt")
     id("androidx.navigation.safeargs.kotlin")
     id("com.google.gms.google-services")
-    //id ("com.google.firebase.crashlytics")
 }
 
 android {
@@ -25,15 +27,27 @@ android {
         enable = true
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
+
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        getByName("release") {
+            isMinifyEnabled = true
+            buildConfigField("Long", "TRACKING_INTERVAL_MILLIS", trackingIntervalRelease)
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
+
+        getByName("debug") {
+            isMinifyEnabled = false
+            buildConfigField("Long", "TRACKING_INTERVAL_MILLIS", trackingIntervalDebug)
+        }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
@@ -53,9 +67,21 @@ android {
         }
     }
 
-
+/*    productFlavors {
+        create("debug") {
+            dimension = "version"
+            buildConfigField("Long", "TRACKING_INTERVAL_MILLIS", trackingIntervalDebug)
+            applicationIdSuffix = ".debug"
+        }
+        create("release") {
+            dimension = "version"
+            buildConfigField("Long", "TRACKING_INTERVAL_MILLIS", trackingIntervalRelease)
+        }
+    }*/
 
 }
+
+
 
 dependencies {
 
@@ -73,15 +99,15 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation ("androidx.test:runner:1.5.2")
-    androidTestImplementation ("androidx.test:rules:1.5.0")
-    androidTestImplementation ("androidx.fragment:fragment-testing:1.6.1")
-    androidTestImplementation ("io.mockk:mockk-android:1.13.1")//1.13.7
-    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.6.1")
+    androidTestImplementation("io.mockk:mockk-android:1.13.1")//1.13.7
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
 
     //Dagger
     implementation("com.google.dagger:dagger:2.48")
-    kapt ("com.google.dagger:dagger-compiler:2.48")
+    kapt("com.google.dagger:dagger-compiler:2.48")
     //implementation("javax.inject:javax.inject:1")
 
     // Kotlin Coroutines
@@ -104,13 +130,13 @@ dependencies {
     implementation("androidx.compose.animation:animation:1.5.1")
     implementation("androidx.compose.ui:ui-tooling:1.5.1")
     implementation("androidx.compose.runtime:runtime-livedata:1.5.1")
-    implementation ("androidx.compose.material3:material3:1.1.2")
-    implementation ("androidx.navigation:navigation-compose:2.7.3")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.navigation:navigation-compose:2.7.3")
 
     //Navigation
     implementation("androidx.navigation:navigation-ui-ktx:2.7.3")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.3")
-    implementation( "androidx.navigation:navigation-dynamic-features-fragment:2.7.3")
+    implementation("androidx.navigation:navigation-dynamic-features-fragment:2.7.3")
 
     //Maps
     implementation("com.google.maps.android:maps-compose:2.5.0")
@@ -120,10 +146,10 @@ dependencies {
     implementation("com.google.maps.android:maps-ktx:3.2.1")
 
     //Network
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.google.code.gson:gson:2.10.1")
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.10.0")
 
     //Room
     implementation("androidx.room:room-runtime:2.5.2")
@@ -131,11 +157,11 @@ dependencies {
     implementation("androidx.room:room-ktx:2.5.2")
 
     //Room
-/*    implementation("androidx.room:room-common:2.5.2")
-    implementation("androidx.room:room-runtime:2.5.2")
-    //annotationProcessor("androidx.room:room-compiler:2.5.2")
-    kapt("androidx.room:room-compiler:2.5.2")
-    implementation("androidx.room:room-ktx:2.5.2")*/
+    /*    implementation("androidx.room:room-common:2.5.2")
+        implementation("androidx.room:room-runtime:2.5.2")
+        //annotationProcessor("androidx.room:room-compiler:2.5.2")
+        kapt("androidx.room:room-compiler:2.5.2")
+        implementation("androidx.room:room-ktx:2.5.2")*/
 
     //Firebase
     //implementation (platform("com.google.firebase:firebase-bom:31.4.0"))
@@ -147,7 +173,6 @@ dependencies {
 
     //Datastore
     implementation("androidx.datastore:datastore-preferences:1.0.0")
-
 
 
 }

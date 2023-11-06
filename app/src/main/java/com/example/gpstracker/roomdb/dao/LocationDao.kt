@@ -15,8 +15,8 @@ interface LocationDao {
     @Query("SELECT * FROM locations WHERE isSynchronized = 0")
     fun getUnsynchronizedLocations(): List<LocationModel>
 
-    /*    @Query("UPDATE locations SET isSynchronized = 1 WHERE isSynchronized = 0")
-        fun markAllAsSynchronized()*/
+    @Query("SELECT * FROM locations")
+    fun getAllLocations(): List<LocationModel>
 
     @Query("UPDATE locations SET isSynchronized = 1 WHERE id = :id")
     fun markAsSynchronized(id: Long)

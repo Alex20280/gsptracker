@@ -1,15 +1,11 @@
 package com.example.gpstracker.di
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.work.ListenableWorker
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.example.gpstracker.usecase.LocationTrackerUseCase
 import com.example.gpstracker.usecase.workManager.CustomWorker
 import com.google.android.gms.location.FusedLocationProviderClient
-import dagger.MapKey
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

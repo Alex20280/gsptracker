@@ -19,8 +19,8 @@ class SignInViewModel @Inject constructor(
     private val dataStorePreference: DataStorePreference
 ): ViewModel() {
 
-    private val signInResult = MutableLiveData<RequestResult<Task<AuthResult>>>()
-    fun getSignInResultLiveData(): LiveData<RequestResult<Task<AuthResult>>> {
+    private val signInResult = MutableLiveData<RequestResult<AuthResult>>()
+    fun getSignInResultLiveData(): LiveData<RequestResult<AuthResult>> {
         return signInResult
     }
 
@@ -32,18 +32,24 @@ class SignInViewModel @Inject constructor(
         }
     }
 
-    private fun checkEmailResponse(response: RequestResult<Task<AuthResult>>) {
-        when (response) {
-            is RequestResult.Success -> {
-                signInResult.value = response
-                saveUserId(firebaseAuthenticationUseCase.getUserUd().toString())
+    private fun checkEmailResponse(response: RequestResult<AuthResult>) {
+            viewModelScope.launch {
+                when (response) {
+                    is RequestResult.Success -> {
+                        // Handle successful login
+                        // You can update your UI or perform other actions here
+                        signInResult.value = response
+                        saveUserId(firebaseAuthenticationUseCase.getUserUd().toString())
+                    }
+                    is RequestResult.Error -> {
+                        // Handle login error
+                        // You can display an error message to the user or perform other error handling here
+                        signInResult.postValue(RequestResult.Error(response.errorData, response.code))
+                    }
+                    is RequestResult.Loading -> Unit
+                }
             }
-            is RequestResult.Error -> {
-                signInResult.postValue(RequestResult.Error(response.errorData, response.code))
-            }
-            is RequestResult.Loading -> Unit
         }
-    }
 
     fun isValidEmail(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()

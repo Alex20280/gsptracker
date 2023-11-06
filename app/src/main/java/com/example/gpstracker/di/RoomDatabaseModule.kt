@@ -8,7 +8,6 @@ import com.example.gpstracker.roomdb.LocationRepositoryImpl
 import com.example.gpstracker.roomdb.dao.LocationDao
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
 
 @Module

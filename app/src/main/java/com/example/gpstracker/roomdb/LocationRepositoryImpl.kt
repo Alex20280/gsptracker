@@ -21,6 +21,12 @@ class LocationRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getAllLocations(): List<LocationModel> {
+        return withContext(Dispatchers.IO){
+            locationDao.getAllLocations()
+        }
+    }
+
     override suspend fun markLocationAsSynchronizedBasedOnId(id: Long) {
         withContext(Dispatchers.IO){
             locationDao.markAsSynchronized(id)

@@ -9,6 +9,8 @@ interface LocationRepository {
 
     suspend fun getUnsynchronizedLocations(): List<LocationModel>
 
+    suspend fun getAllLocations(): List<LocationModel>
+
     suspend fun markLocationAsSynchronizedBasedOnId(id: Long)
 
 }

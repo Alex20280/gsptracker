@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.work.WorkManager
 import com.example.gpstracker.base.extentions.myDataStore
 import com.example.gpstracker.prefs.DataStorePreference
-import com.example.gpstracker.prefs.UserPreferences
 import com.example.gpstracker.roomdb.LocationRepositoryImpl
 import com.example.gpstracker.roomdb.dao.LocationDao
 import com.example.gpstracker.ui.forgetpassword.viewmodel.ForgetPasswordViewModel

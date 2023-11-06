@@ -1,11 +1,13 @@
 package com.example.gpstracker.usecase
 
+import android.util.Log
 import androidx.annotation.NonNull
 import com.example.gpstracker.network.ErrorDto
 import com.example.gpstracker.network.RequestResult
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.tasks.await
 
 
 class FirebaseAuthenticationUseCase(private val auth: FirebaseAuth) {
@@ -20,13 +22,15 @@ class FirebaseAuthenticationUseCase(private val auth: FirebaseAuth) {
         }
     }
 
-    fun loginUser(email: String, password: String): RequestResult<Task<AuthResult>> {
-        try {
+    suspend fun loginUser(email: String, password: String): RequestResult<AuthResult> {
+        return try {
             val authResultTask = auth.signInWithEmailAndPassword(email, password)
-            return RequestResult.Success(authResultTask)
+            authResultTask.await() // Wait for the task to complete
+            // If you reach this point, the task is considered successful
+            RequestResult.Success(authResultTask.result!!)
         } catch (e: Exception) {
-            // Handle exceptions here
-            return RequestResult.Error(ErrorDto.Default("Login problem"), 0)
+            // Handle exceptions and errors here
+            RequestResult.Error(ErrorDto.Default(e.localizedMessage ?: "Login problem"), 0)
         }
     }
 

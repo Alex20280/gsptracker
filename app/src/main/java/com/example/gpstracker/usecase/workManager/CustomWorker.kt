@@ -3,17 +3,11 @@ package com.example.gpstracker.usecase.workManager
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.example.gpstracker.app.App
-import com.example.gpstracker.di.DaggerAppComponent
 import com.example.gpstracker.roomdb.LocationRepository
 import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import javax.inject.Inject
-import javax.inject.Provider
 
 class CustomWorker(
     context: Context,
@@ -31,13 +25,13 @@ class CustomWorker(
 
     override suspend fun doWork(): Result {
 
-        Log.d("SomeCustomWorker", "working")
+        Log.d("SomeCustoWorkerm", "working")
         return try {
             val result = locationRepository.getUnsynchronizedLocations()
 
             for (location in result) {
                 // Step 2: Send unsynchronized data to Firebase
-                Log.d("MyworkManagerRun",location.id.toString() + location.isSynchronized.toString())
+                Log.d("MyworkManagerRun",location.id.toString() + "long: " + location.latitude + "sync: " + location.isSynchronized.toString())
                 val success = locationServiceUseCase.saveLocationFromRoomDatabase(location.latitude, location.longitude)
 
                 if (success) {
@@ -45,6 +39,12 @@ class CustomWorker(
                     locationRepository.markLocationAsSynchronizedBasedOnId(location.id)
                 }
             }
+
+/*            val allLocations = locationRepository.getAllLocations()
+            for (myLocations in allLocations) {
+                Log.d("MyworkManagerRun",myLocations.id.toString() + "long: " + myLocations.latitude + "sync: " + myLocations.isSynchronized.toString())
+            }*/
+
             Log.d("MyWorkerJob", "success")
             Result.success()
         } catch (e: Exception) {
@@ -52,18 +52,4 @@ class CustomWorker(
             Result.failure()
         }
     }
-
-/*    class Factory @Inject constructor(
-        private val locationServiceUseCase: Provider<FirebaseDatabaseUseCase>,
-        private val locationRepository: Provider<LocationRepository>
-    ) : ChildWorkerFactory {
-        override fun create(appContext: Context, params: WorkerParameters): ListenableWorker {
-            return CustomWorker(
-                appContext,
-                params,
-                locationServiceUseCase.get(),
-                locationRepository.get()
-            )
-        }
-    }*/
 }

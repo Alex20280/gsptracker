@@ -1,5 +1,7 @@
 val trackingIntervalDebug: String = "10000L"
 val trackingIntervalRelease: String = "600000L"
+val trackingIntervalMetersDebug: String = "10"
+val trackingIntervalMetersRelease: String = "60"
 
 plugins {
     id("com.android.application")
@@ -36,6 +38,7 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             buildConfigField("Long", "TRACKING_INTERVAL_MILLIS", trackingIntervalRelease)
+            buildConfigField("int", "TRACKING_INTERVAL_METERS", trackingIntervalMetersRelease)
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -45,6 +48,7 @@ android {
         getByName("debug") {
             isMinifyEnabled = false
             buildConfigField("Long", "TRACKING_INTERVAL_MILLIS", trackingIntervalDebug)
+            buildConfigField("int", "TRACKING_INTERVAL_METERS", trackingIntervalMetersDebug)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.example.gpstracker.ui.track
+package com.example.gpstracker.ui.track.screens.customview
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -10,6 +10,7 @@ import android.view.View
 import android.graphics.Canvas
 import android.graphics.RectF
 import com.example.gpstracker.R
+import com.example.gpstracker.ui.track.TrackerState
 
 class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private var state = TrackerState.OFF
@@ -65,7 +66,7 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
         when (state) {
             TrackerState.OFF -> {
                 val smallerRadius = radius / 5f
-                val circleX = centerX + radius / 20f // Move the circle to the right
+                val circleX = centerX + radius / 2.5f // Move the circle to the right
                 val circleY = centerY - radius / 3f // Move the circle higher
                 circlePaint.color = resources.getColor(R.color.light_grey)
                 canvas.drawCircle(circleX, circleY, smallerRadius, circlePaint)
@@ -77,7 +78,7 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
 
             TrackerState.ON -> {
                 val smallerRadius = radius / 5f
-                val circleX = centerX + radius / 20f // Move the circle to the right
+                val circleX = centerX + radius / 2.5f // Move the circle to the right
                 val circleY = centerY - radius / 3f // Move the circle higher
                 circlePaint.color = resources.getColor(R.color.colorAccent)
                 canvas.drawCircle(circleX, circleY, smallerRadius, circlePaint)

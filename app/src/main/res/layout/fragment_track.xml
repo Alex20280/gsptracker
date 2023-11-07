@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".YourActivity">
 
-    <com.example.gpstracker.ui.track.StatefulCircleView
+    <com.example.gpstracker.ui.track.screens.customview.StatefulCircleView
         android:id="@+id/statefulCircleView"
         android:layout_width="140dp"
         android:layout_height="140dp"

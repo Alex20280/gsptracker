@@ -2,6 +2,7 @@ package com.example.gpstracker.di
 
 import com.example.gpstracker.MainActivity
 import com.example.gpstracker.ui.forgetpassword.ForgetPasswordFragment
+import com.example.gpstracker.ui.service.TrackingService
 import com.example.gpstracker.ui.signin.SignInFragment
 import com.example.gpstracker.ui.signup.SignUpFragment
 import com.example.gpstracker.ui.track.TrackFragment
@@ -25,4 +26,5 @@ interface AppComponent {
     fun inject(mapsFragment: SignUpFragment?)
     fun inject(mapsFragment: TrackFragment?)
     fun inject(worker: CustomWorker?)
+    fun inject(service: TrackingService?)
 }

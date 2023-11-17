@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.gpstracker"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -111,8 +111,10 @@ dependencies {
 
     //Dagger
     implementation("com.google.dagger:dagger:2.48")
+    implementation("com.google.dagger:dagger-android")//
+    implementation("com.google.dagger:dagger-android-support:2.48") //
     kapt("com.google.dagger:dagger-compiler:2.48")
-    //implementation("javax.inject:javax.inject:1")
+    kapt("com.google.dagger:dagger-android-processor:2.48") //
 
     // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")

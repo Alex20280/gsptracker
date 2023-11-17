@@ -4,12 +4,14 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -53,6 +55,14 @@ class TrackFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTrackBinding.inflate(inflater, container, false)
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                0
+            )
+        }
 
         viewModelInstanciation()
         startButtonClicked()
@@ -164,11 +174,11 @@ class TrackFragment : Fragment() {
     }
 
     private fun startTrackLocation() {
-        trackViewModel?.startTracking()
+        trackViewModel?.startTrackingService()
     }
 
     private fun stopTrackLocation() {
-        trackViewModel?.stopTrackLocation()
+        trackViewModel?.stopTrackingService()
     }
 
 

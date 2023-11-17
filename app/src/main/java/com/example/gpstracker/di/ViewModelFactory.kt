@@ -10,6 +10,7 @@ import com.example.gpstracker.prefs.DataStorePreference
 import com.example.gpstracker.roomdb.LocationRepositoryImpl
 import com.example.gpstracker.roomdb.dao.LocationDao
 import com.example.gpstracker.ui.forgetpassword.viewmodel.ForgetPasswordViewModel
+import com.example.gpstracker.ui.service.TrackingService
 import com.example.gpstracker.ui.signin.viewmodel.SignInViewModel
 import com.example.gpstracker.ui.signup.viewmodel.SignUpViewModel
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel

@@ -7,14 +7,21 @@ import androidx.core.app.NotificationCompat
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class TrackingService : Service() {
 
     @Inject
     lateinit var locationServiceUseCase: FirebaseDatabaseUseCase
-
-
+    private val serviceScope = CoroutineScope(Dispatchers.Main)
+    private var locationJob: Job? = null
     private val NOTIFICATION_ID = 1234
     private val CHANNEL_ID = "running_channel"
 
@@ -23,20 +30,27 @@ class TrackingService : Service() {
         (application as App).appComponent.inject(this)
     }
 
-
     override fun onBind(p0: Intent?): IBinder? {
         return null
     }
 
-
     private fun startServiceTracking() {
-        locationServiceUseCase.saveLocation()
+        locationJob = serviceScope.launch {
+            while (isActive) {
+                locationServiceUseCase.saveLocation()
+                delay(com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS)
+            }
+        }
     }
 
+    private fun stopService(){
+        serviceScope.cancel()
+    }
 
     override fun onDestroy() {
         stopForeground(true)
         stopSelf()
+        serviceScope.cancel()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -46,7 +60,10 @@ class TrackingService : Service() {
                 startServiceTracking()
             }
 
-            Actions.STOP.toString() -> stopSelf()
+            Actions.STOP.toString() -> {
+                stopService()
+                stopSelf()
+            }
         }
         return super.onStartCommand(intent, flags, startId)
     }

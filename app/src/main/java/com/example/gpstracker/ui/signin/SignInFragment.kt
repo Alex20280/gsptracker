@@ -2,65 +2,38 @@ package com.example.gpstracker.ui.signin
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
-import com.example.gpstracker.base.BaseFragment
 import com.example.gpstracker.base.extentions.openScreen
 import com.example.gpstracker.databinding.FragmentSignInBinding
-import com.example.gpstracker.databinding.FragmentTrackBinding
-import com.example.gpstracker.di.ViewModelFactory
 import com.example.gpstracker.network.RequestResult
 import com.example.gpstracker.ui.signin.viewmodel.SignInViewModel
-import com.example.gpstracker.ui.signup.SignUpFragmentDirections
-import com.example.gpstracker.ui.signup.viewmodel.SignUpViewModel
 import javax.inject.Inject
 
-class SignInFragment : Fragment() {
+class SignInFragment : Fragment(R.layout.fragment_sign_in) {
+
+    private val binding by viewBinding(FragmentSignInBinding::bind)
+
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var signInViewModel: SignInViewModel
 
-    private var _binding: FragmentSignInBinding? = null
-    private val binding get() = _binding!!
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    @JvmField
-    @Inject
-    var signInViewModel: SignInViewModel? = null
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSignInBinding.inflate(inflater, container, false)
-
-        viewModelInstanciation()
-
+        viewModelInstantiation()
         navigateToForgetPasswordScreen()
         observeSubmitClick()
         observeLogin()
         navigateToSignUpPage()
-
-        return binding.root
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
-
-    private fun viewModelInstanciation() {
+    private fun viewModelInstantiation() {
         (requireContext().applicationContext as App).appComponent.inject(this)
-        signInViewModel =
-            ViewModelProvider(requireActivity(), viewModelFactory).get(SignInViewModel::class.java)
-
     }
 
     private fun observeSubmitClick() {
@@ -69,14 +42,14 @@ class SignInFragment : Fragment() {
             val email: String = binding.editTextEmail.text?.toString() ?: ""
             val password: String = binding.editTextPassword.text?.toString() ?: ""
 
-            if (signInViewModel!!.isValidEmail(email) && signInViewModel!!.isValidPassword(password)) {
-                signInViewModel?.loginUser(email, password)
+            if (signInViewModel.isValidEmail(email) && signInViewModel.isValidPassword(password)) {
+                signInViewModel.loginUser(email, password)
             } else {
                 // Show error messages or UI feedback for invalid input
-                if (signInViewModel!!.isValidEmail(email)) {
+                if (signInViewModel.isValidEmail(email)) {
                     binding.editTextEmail.error = getString(R.string.invalid_email_warning)
                 }
-                if (!signInViewModel!!.isValidPassword(password)) {
+                if (!signInViewModel.isValidPassword(password)) {
                     binding.editTextPassword.error = getString(R.string.invalid_password_warning)
                 }
             }
@@ -85,7 +58,7 @@ class SignInFragment : Fragment() {
     }
 
     private fun observeLogin() {
-        signInViewModel?.getSignInResultLiveData()?.observe(viewLifecycleOwner) { result ->
+        signInViewModel.getSignInResultLiveData().observe(viewLifecycleOwner) { result ->
             when (result) {
                 is RequestResult.Success -> {
                     navigateToTrackPage()

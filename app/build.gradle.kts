@@ -97,6 +97,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation ("androidx.fragment:fragment-ktx:1.6.2")
+    implementation ("com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.9")
 
 
     //Test

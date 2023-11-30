@@ -10,48 +10,34 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.base.extentions.openScreen
+import com.example.gpstracker.databinding.FragmentSignInBinding
 import com.example.gpstracker.databinding.FragmentSignUpBinding
 import com.example.gpstracker.di.ViewModelFactory
 import com.example.gpstracker.network.RequestResult
 import com.example.gpstracker.ui.signup.viewmodel.SignUpViewModel
 import javax.inject.Inject
 
-class SignUpFragment : Fragment() {
+class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
+
+    private val binding by viewBinding(FragmentSignUpBinding::bind)
 
     @Inject
-    lateinit var viewModelFactory: ViewModelFactory
+    lateinit var signUpViewModel: SignUpViewModel
 
-    private var _binding: FragmentSignUpBinding ? = null
-    private val binding get() = _binding!!
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    @JvmField
-    @Inject
-    var signUpViewModel: SignUpViewModel? = null
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentSignUpBinding.inflate(inflater, container, false)
-
-        viewModelInstanciation()
+        viewModelInstantiation()
         registerUser()
         observeRegistration()
-
-        return binding.root
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     private fun observeRegistration() {
-        signUpViewModel?.getSignUpResultLiveData()?.observe(viewLifecycleOwner) { result ->
+        signUpViewModel.getSignUpResultLiveData().observe(viewLifecycleOwner) { result ->
             when(result){
                 is RequestResult.Success -> {
                     openScreen(SignUpFragmentDirections.actionSignUpFragmentToSignInFragment())
@@ -64,11 +50,8 @@ class SignUpFragment : Fragment() {
         }
     }
 
-    private fun viewModelInstanciation() {
+    private fun viewModelInstantiation() {
         (requireContext().applicationContext as App).appComponent.inject(this)
-        signUpViewModel =
-            ViewModelProvider(requireActivity(), viewModelFactory).get(SignUpViewModel::class.java)
-
     }
 
     private fun registerUser() {

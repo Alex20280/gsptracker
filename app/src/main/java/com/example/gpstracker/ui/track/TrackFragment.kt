@@ -7,18 +7,15 @@ import android.content.res.ColorStateList
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.databinding.FragmentTrackBinding
-import com.example.gpstracker.di.ViewModelFactory
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,35 +23,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class TrackFragment : Fragment() {
+class TrackFragment : Fragment(R.layout.fragment_track) {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-
-    private var _binding: FragmentTrackBinding? = null
-    private val binding get() = _binding!!
+    private val binding by viewBinding(FragmentTrackBinding::bind)
 
     private var isTracking = false
 
     val valueAnimator = ValueAnimator.ofInt(1, 360)
 
-    @JvmField
     @Inject
-    var trackViewModel: TrackViewModel? = null
+    lateinit var trackViewModel: TrackViewModel
+
     private val LOCATION_PERMISSION_REQUEST_CODE = 100
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestLocationPermission()
-
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentTrackBinding.inflate(inflater, container, false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
             ActivityCompat.requestPermissions(
@@ -63,18 +52,10 @@ class TrackFragment : Fragment() {
                 0
             )
         }
-
-        viewModelInstanciation()
+        viewModelInstantiation()
         startButtonClicked()
         observeTrackState()
         initAnimation()
-
-        return binding.root
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
     }
 
     private fun initAnimation() {
@@ -95,11 +76,11 @@ class TrackFragment : Fragment() {
     }
 
     private fun startWorkManager() {
-        trackViewModel?.syncLocalDatabaseAndRemoteDatabase()
+        trackViewModel.syncLocalDatabaseAndRemoteDatabase()
     }
 
     private fun observeTrackState() {
-        trackViewModel?.getStateLiveData()?.observe(viewLifecycleOwner) { state ->
+        trackViewModel.getStateLiveData().observe(viewLifecycleOwner) { state ->
             when (state) {
                 TrackerState.ON -> {
                     changeCustomViewState(TrackerState.ON)
@@ -161,39 +142,37 @@ class TrackFragment : Fragment() {
     private fun startButtonClicked() {
         binding.startButton.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
-                Log.d("dscdcdscdvf", trackViewModel?.getDataStoreUID().toString())
+                Log.d("dscdcdscdvf", trackViewModel.getDataStoreUID().toString())
             }
             if (!isTracking) {
                 isTracking = true
-                trackViewModel?._stateLiveData?.value = TrackerState.ON
+                trackViewModel._stateLiveData.value = TrackerState.ON
             } else {
                 isTracking = false
-                trackViewModel?._stateLiveData?.value = TrackerState.OFF
+                trackViewModel._stateLiveData.value = TrackerState.OFF
             }
         }
     }
 
     private fun startTrackLocation() {
-        trackViewModel?.startTrackingService()
+        trackViewModel.startTrackingService()
     }
 
     private fun stopTrackLocation() {
-        trackViewModel?.stopTrackingService()
+        trackViewModel.stopTrackingService()
     }
 
 
     private fun trackInternetAvailability() {
-        trackViewModel?.startTrackInternetAvailability()
+        trackViewModel.startTrackInternetAvailability()
     }
 
     private fun stopTrackInternetAvailability() {
-        trackViewModel?.stopTrackInternetAvailability()
+        trackViewModel.stopTrackInternetAvailability()
     }
 
-    private fun viewModelInstanciation() {
+    private fun viewModelInstantiation() {
         (requireContext().applicationContext as App).appComponent.inject(this)
-        trackViewModel =
-            ViewModelProvider(requireActivity(), viewModelFactory).get(TrackViewModel::class.java)
     }
 
     private fun changeCustomViewState(state: TrackerState) {

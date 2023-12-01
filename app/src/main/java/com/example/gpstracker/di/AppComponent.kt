@@ -12,6 +12,7 @@ import javax.inject.Singleton
 
 @Component(modules = [
     AppModule::class,
+    ViewModelModule::class,
     FirebaseRegistrationModule::class,
     LocationServiceModule::class,
     RoomDatabaseModule::class,

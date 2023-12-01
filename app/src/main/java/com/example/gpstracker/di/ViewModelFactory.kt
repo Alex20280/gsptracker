@@ -33,57 +33,11 @@ import kotlin.reflect.KClass
 
 @Singleton
 class ViewModelFactory @Inject constructor(
-    private val fusedLocationProviderClient: FusedLocationProviderClient,
-    private val databaseReference: DatabaseReference,
-    private val viewModels: MutableMap<Class<out ViewModel>,
-            Provider<ViewModel>>,
-    private val context: Context,
-    private val locationDao: LocationDao,
-    private val workManager: WorkManager
+    private val providers: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>>
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        val viewModelProvider = viewModels[modelClass]
-
-        if (viewModelProvider != null) {
-            return viewModelProvider.get() as T
-        }
-        when {
-            modelClass.isAssignableFrom(SignInViewModel::class.java) -> {
-                return SignInViewModel(
-                    firebaseAuthenticationUseCase = FirebaseAuthenticationUseCase(
-                        auth = FirebaseAuth.getInstance()),
-                    dataStorePreference = DataStorePreference(context.myDataStore)
-                ) as T
-            }
-
-            modelClass.isAssignableFrom(SignUpViewModel::class.java) -> {
-                return SignUpViewModel(registrationUseCase = FirebaseAuthenticationUseCase(
-                    auth = FirebaseAuth.getInstance())) as T
-            }
-
-            modelClass.isAssignableFrom(TrackViewModel::class.java) -> {
-                return TrackViewModel(
-                    locationServiceUseCase = FirebaseDatabaseUseCase(
-                        fusedLocationClient = fusedLocationProviderClient,
-                        database = databaseReference
-                    ), firebaseDatabase = databaseReference,
-                    applicationContext = context,
-                    locationRepository = LocationRepositoryImpl(locationDao),
-                    locationTrackerUseCase = LocationTrackerUseCase(
-                        fusedLocationClient = fusedLocationProviderClient
-                    ),
-                    workManager = workManager,
-                    dataStorePreference = DataStorePreference(context.myDataStore)
-                ) as T
-            }
-
-            modelClass.isAssignableFrom(ForgetPasswordViewModel::class.java) -> {
-                return ForgetPasswordViewModel(firebaseAuth = FirebaseAuthenticationUseCase(
-                    auth = FirebaseAuth.getInstance())) as T
-            }
-
-            else -> throw IllegalArgumentException("Unknown ViewModel class: $modelClass")
-        }
+        val provider = providers[modelClass]
+        return provider?.get() as T ?: throw IllegalArgumentException("Unknown ViewModel class: $modelClass")
     }
 }

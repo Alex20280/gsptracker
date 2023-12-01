@@ -29,5 +29,4 @@ object LocationServiceModule {
         return FirebaseDatabase.getInstance().reference.child("locations")
     }
 
-
 }

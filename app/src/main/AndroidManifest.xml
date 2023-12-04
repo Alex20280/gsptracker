@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.GPSTracker"
+        android:theme="@style/Base.Theme.GPSTracker"
         tools:targetApi="31">
         <service android:name=".ui.service.TrackingService" android:foregroundServiceType="location" />
 

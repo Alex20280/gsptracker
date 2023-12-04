@@ -1,11 +1,13 @@
 package com.example.gpstracker.ui.track.viewmodel
 
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -34,33 +36,26 @@ import java.util.TimerTask
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
-    private val locationServiceUseCase: FirebaseDatabaseUseCase,
     private val firebaseDatabase: DatabaseReference,
-    private val applicationContext: Context,
+    private val application: Application,
     private val locationRepository: LocationRepository,
     private val locationTrackerUseCase: LocationTrackerUseCase,
     private val workManager: WorkManager,
     private val dataStorePreference: DataStorePreference
-) : ViewModel() {
-
+) : AndroidViewModel(application) {
 
     private var internetTimer: Timer? = null
-    private var dataSentTimer: Timer? = null
 
     val _stateLiveData = MutableLiveData<TrackerState>()
     fun getStateLiveData(): LiveData<TrackerState> {
         return _stateLiveData
     }
 
-    private val locationManager =
-        applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    private var lastLocation: Location? = null
-
-    suspend fun getDataStoreUID(): String? {
+/*    suspend fun getDataStoreUID(): String? {
         return viewModelScope.async {
             dataStorePreference.getData("UID")
         }.await()
-    }
+    }*/
 
 
     init {
@@ -69,51 +64,20 @@ class TrackViewModel @Inject constructor(
 
 
     private fun saveLocation() {
-        Intent(applicationContext.applicationContext, TrackingService::class.java).also {
+        Intent(application.applicationContext, TrackingService::class.java).also {
             it.action = TrackingService.Actions.START.toString()
-            applicationContext.applicationContext.startForegroundService(it)
+            application.applicationContext.startForegroundService(it)
         }
     }
 
     fun stopTrackingService() {
-        Intent(applicationContext.applicationContext, TrackingService::class.java).also {
+        Intent(application.applicationContext, TrackingService::class.java).also {
             it.action = TrackingService.Actions.STOP.toString()
-            applicationContext.applicationContext.stopService(it)
+            application.applicationContext.stopService(it)
         }
     }
 
-
-
-    /*    fun saveLocation() {
-            viewModelScope.launch {
-                locationServiceUseCase.saveLocation()
-            }
-        }*/
-
-
-    /*    fun startTracking(){
-            if (dataSentTimer == null) {
-                dataSentTimer = Timer()
-                val trackingIntervalMillis = com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS // 10000L//   10000L// 10 sec
-                dataSentTimer?.scheduleAtFixedRate(object : TimerTask() {
-                    override fun run() {
-                        val isInternetConnected = isInternetConnected()
-                        val isFirebaseConnected = isFirebaseDatabaseAvailable()
-                        if (isInternetConnected == true && isFirebaseConnected == true) {
-                            saveLocation()
-                        } else {
-                            saveToRoomDatabase()
-                        }
-                    }
-                }, 0, trackingIntervalMillis)
-            }
-        }*/
-
     fun startTrackingService() {
-        //val trackingIntervalMillis = 10 * 60 * 1000L // 10 minutes (10 * 60 seconds * 1000 milliseconds)
-        // val minDistance = 60.0f // Sensitivity: 60 meters
-
-        //val locationListener = LocationListener { location ->
         val isInternetConnected = isInternetConnected()
         val isFirebaseConnected = isFirebaseDatabaseAvailable()
 
@@ -122,48 +86,7 @@ class TrackViewModel @Inject constructor(
         } else {
             saveToRoomDatabase()
         }
-
-//            val currentLocation = lastLocation
-//            if (currentLocation == null || location.distanceTo(currentLocation) >= minDistance) {
-//                lastLocation = location
-//            }
-        //  }
-
     }
-
-    /*    fun startTracking() {
-            val trackingIntervalMillis = 10 * 60 * 1000L // 10 minutes (10 * 60 seconds * 1000 milliseconds)
-            val minDistance = 60.0f // Sensitivity: 60 meters
-
-            val locationListener = LocationListener { location ->
-                val isInternetConnected = isInternetConnected()
-                val isFirebaseConnected = isFirebaseDatabaseAvailable()
-
-                if (isInternetConnected && isFirebaseConnected) {
-                    saveLocation()
-                } else {
-                    saveToRoomDatabase()
-                }
-
-                val currentLocation = lastLocation
-                if (currentLocation == null || location.distanceTo(currentLocation) >= minDistance) {
-                    lastLocation = location
-                }
-            }
-
-            try {
-                locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
-                    trackingIntervalMillis,
-                    minDistance,
-                    locationListener
-                )
-            } catch (e: SecurityException) {
-                // Handle location permission denied
-            }
-        }*/
-
-
 
     fun stopTrackInternetAvailability() {
         internetTimer?.cancel()
@@ -191,7 +114,7 @@ class TrackViewModel @Inject constructor(
 
     private fun isInternetConnected(): Boolean {
         val connectivityManager =
-            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            application.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkCapabilities = connectivityManager.activeNetwork ?: return false
         val activeNetwork =
             connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
@@ -217,8 +140,6 @@ class TrackViewModel @Inject constructor(
                 viewModelScope.launch {
                     locationRepository.saveGpsLocation(locationModel)
                 }
-            } else {
-                // Handle the case where location data is not available
             }
         }
     }

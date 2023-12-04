@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
+import com.example.gpstracker.base.extentions.hideKeyboard
 import com.example.gpstracker.base.extentions.openScreen
 import com.example.gpstracker.databinding.FragmentSignInBinding
 import com.example.gpstracker.network.RequestResult
@@ -27,16 +28,16 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
         viewModelInstantiation()
         navigateToForgetPasswordScreen()
-        observeSubmitClick()
-        observeLogin()
-        navigateToSignUpPage()
+        initSubmitClickListener()
+        initSignInResultListener()
+        initSignUpClickListener()
     }
 
     private fun viewModelInstantiation() {
         (requireContext().applicationContext as App).appComponent.inject(this)
     }
 
-    private fun observeSubmitClick() {
+    private fun initSubmitClickListener() {
         binding.button.setOnClickListener {
             hideKeyboard()
             val email: String = binding.editTextEmail.text?.toString() ?: ""
@@ -57,7 +58,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         }
     }
 
-    private fun observeLogin() {
+    private fun initSignInResultListener() {
         signInViewModel.getSignInResultLiveData().observe(viewLifecycleOwner) { result ->
             when (result) {
                 is RequestResult.Success -> {
@@ -74,7 +75,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
     }
 
-    private fun navigateToSignUpPage() {
+    private fun initSignUpClickListener() {
         binding.textViewSignUp.setOnClickListener {
             openScreen(SignInFragmentDirections.actionSignInFragmentToSignUpFragment())
         }
@@ -90,12 +91,4 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         }
     }
 
-    fun Fragment.hideKeyboard() {
-        val activity = requireActivity()
-        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val view = activity.currentFocus
-        if (view != null) {
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
-        }
-    }
 }

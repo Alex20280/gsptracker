@@ -4,13 +4,13 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.example.gpstracker.di.AppComponent
 import com.example.gpstracker.di.AppModule
 import com.example.gpstracker.di.DaggerAppComponent
+import com.example.gpstracker.utils.Utils
 
 class App : Application(), Configuration.Provider {
 
@@ -35,7 +35,7 @@ class App : Application(), Configuration.Provider {
 
     private fun initNotificationChannel() {
         val channel = NotificationChannel(
-            "running_channel",
+            Utils.CHANNEL_ID,
             "Running notification",
             NotificationManager.IMPORTANCE_HIGH
         )

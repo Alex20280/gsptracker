@@ -7,6 +7,7 @@ import androidx.core.app.NotificationCompat
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
+import com.example.gpstracker.utils.Utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -23,7 +24,6 @@ class TrackingService : Service() {
     private val serviceScope = CoroutineScope(Dispatchers.Main)
     private var locationJob: Job? = null
     private val NOTIFICATION_ID = 1234
-    private val CHANNEL_ID = "running_channel"
 
     override fun onCreate() {
         super.onCreate()
@@ -69,7 +69,7 @@ class TrackingService : Service() {
     }
 
     private fun start() {
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(this, Utils.CHANNEL_ID)
             .setContentTitle("Location Tracking")
             .setContentText("Tracking location updates")
             .setSmallIcon(R.drawable.track_point)

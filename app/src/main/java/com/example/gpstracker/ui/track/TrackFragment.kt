@@ -27,31 +27,16 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
 
     private val binding by viewBinding(FragmentTrackBinding::bind)
 
-    private var isTracking = false
-
-    val valueAnimator = ValueAnimator.ofInt(1, 360)
-
     @Inject
     lateinit var trackViewModel: TrackViewModel
 
+    private var isTracking = false
+    val valueAnimator = ValueAnimator.ofInt(1, 360)
     private val LOCATION_PERMISSION_REQUEST_CODE = 100
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        requestLocationPermission()
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                0
-            )
-        }
         viewModelInstantiation()
         startButtonClicked()
         observeTrackState()
@@ -110,43 +95,26 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //TODO
-            }
-        }
-    }
-
-    private fun requestLocationPermission() {
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Permission is not granted; request it
-            requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
-        } else {
-            // Permission is already granted; you can proceed with location-related tasks
-        }
-    }
-
 
     private fun startButtonClicked() {
         binding.startButton.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                Log.d("dscdcdscdvf", trackViewModel.getDataStoreUID().toString())
-            }
             if (!isTracking) {
-                isTracking = true
-                trackViewModel._stateLiveData.value = TrackerState.ON
+                if (ContextCompat.checkSelfPermission(
+                        requireContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    // Permission is not granted; request it
+                    requestPermissions(
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                        LOCATION_PERMISSION_REQUEST_CODE
+                    )
+                }else{
+                    // Permission granted
+                    isTracking = true
+                    trackViewModel._stateLiveData.value = TrackerState.ON
+                }
+
             } else {
                 isTracking = false
                 trackViewModel._stateLiveData.value = TrackerState.OFF

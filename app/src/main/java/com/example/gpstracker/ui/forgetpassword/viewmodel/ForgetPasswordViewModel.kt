@@ -36,7 +36,7 @@ class ForgetPasswordViewModel @Inject constructor(
                     resetPasswordResult.value = result
                 }
                 is RequestResult.Error -> {
-                    resetPasswordResult.postValue(RequestResult.Error(result.errorData, result.code))
+                    resetPasswordResult.value = RequestResult.Error(result.errorData, result.code)
                 }
                 is RequestResult.Loading -> Unit
             }

@@ -11,12 +11,12 @@
         tools:layout="@layout/fragment_sign_up" >
         <action
             android:id="@+id/action_signUpFragment_to_signInFragment"
-            app:destination="@id/signInFragment" />
+            app:destination="@id/signInFragment"/>
     </fragment>
     <fragment
         android:id="@+id/signInFragment"
         android:name="com.example.gpstracker.ui.signin.SignInFragment"
-        android:label="Sign In" >
+        android:label="Sign In">
         <action
             android:id="@+id/action_signInFragment_to_forgetPasswordFragment"
             app:destination="@id/forgetPasswordFragment" />

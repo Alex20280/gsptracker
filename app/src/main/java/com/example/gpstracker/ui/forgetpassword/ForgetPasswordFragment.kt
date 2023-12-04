@@ -34,7 +34,7 @@ class ForgetPasswordFragment : Fragment(R.layout.fragment_forget_password) {
     }
 
     private fun observePasswordResetResult() {
-        forgetPasswordViewModel.getResetPasswordResultLiveData()?.observe(viewLifecycleOwner) { result ->
+        forgetPasswordViewModel.getResetPasswordResultLiveData().observe(viewLifecycleOwner) { result ->
             when (result) {
                 is RequestResult.Success -> {
                     navigateToSignInPage()
@@ -57,7 +57,7 @@ class ForgetPasswordFragment : Fragment(R.layout.fragment_forget_password) {
 
     private fun resetButtonClick() {
         binding.submitBtn.setOnClickListener {
-            forgetPasswordViewModel?.resetPassword(binding.resetPasswordEt.text.toString())
+            forgetPasswordViewModel.resetPassword(binding.resetPasswordEt.text.toString())
 
         }
     }

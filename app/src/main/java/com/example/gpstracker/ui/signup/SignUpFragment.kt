@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
+import com.example.gpstracker.base.extentions.hideKeyboard
 import com.example.gpstracker.base.extentions.openScreen
 import com.example.gpstracker.databinding.FragmentSignInBinding
 import com.example.gpstracker.databinding.FragmentSignUpBinding
@@ -60,26 +61,17 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
             val email: String = binding.emailEt.text?.toString() ?: ""
             val password: String = binding.passwordEt.text?.toString() ?: ""
 
-            if (signUpViewModel!!.isValidEmail(email) && signUpViewModel!!.isValidPassword(password)) {
-                signUpViewModel?.registerUser(email, password)
+            if (signUpViewModel.isValidEmail(email) && signUpViewModel.isValidPassword(password)) {
+                signUpViewModel.registerUser(email, password)
             } else {
                 // Show error messages or UI feedback for invalid input
-                if (signUpViewModel!!.isValidEmail(email)) {
+                if (signUpViewModel.isValidEmail(email)) {
                     binding.emailEt.error = getString(R.string.invalid_email_warning)
                 }
-                if (!signUpViewModel!!.isValidPassword(password)) {
+                if (!signUpViewModel.isValidPassword(password)) {
                     binding.passwordEt.error = getString(R.string.invalid_password_warning)
                 }
             }
-        }
-    }
-
-    fun Fragment.hideKeyboard() {
-        val activity = requireActivity()
-        val imm = activity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val view = activity.currentFocus
-        if (view != null) {
-            imm.hideSoftInputFromWindow(view.windowToken, 0)
         }
     }
 

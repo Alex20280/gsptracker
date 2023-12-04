@@ -4,22 +4,16 @@ import android.Manifest
 import android.animation.ValueAnimator
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
-import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
+import com.example.gpstracker.base.extentions.viewBinding
 import com.example.gpstracker.databinding.FragmentTrackBinding
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 

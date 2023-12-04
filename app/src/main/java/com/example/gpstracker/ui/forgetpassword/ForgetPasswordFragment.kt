@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.base.extentions.openScreen
+import com.example.gpstracker.base.extentions.viewBinding
 import com.example.gpstracker.databinding.FragmentForgetPasswordBinding
 import com.example.gpstracker.network.RequestResult
 import com.example.gpstracker.ui.forgetpassword.viewmodel.ForgetPasswordViewModel

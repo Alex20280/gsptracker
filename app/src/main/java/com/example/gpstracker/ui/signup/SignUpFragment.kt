@@ -1,23 +1,15 @@
 package com.example.gpstracker.ui.signup
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
 import com.example.gpstracker.base.extentions.hideKeyboard
 import com.example.gpstracker.base.extentions.openScreen
-import com.example.gpstracker.databinding.FragmentSignInBinding
+import com.example.gpstracker.base.extentions.viewBinding
 import com.example.gpstracker.databinding.FragmentSignUpBinding
-import com.example.gpstracker.di.ViewModelFactory
 import com.example.gpstracker.network.RequestResult
 import com.example.gpstracker.ui.signup.viewmodel.SignUpViewModel
 import javax.inject.Inject

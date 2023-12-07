@@ -11,8 +11,9 @@ import com.google.firebase.database.ServerValue
 import com.google.firebase.ktx.Firebase
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationResult
+import javax.inject.Inject
 
-class FirebaseDatabaseUseCase(
+class FirebaseDatabaseUseCase @Inject constructor(
     private val fusedLocationClient: FusedLocationProviderClient,
     private val database: DatabaseReference
 ) {
@@ -68,56 +69,4 @@ class FirebaseDatabaseUseCase(
             userId.toString() + latitude.toString() + "longitude" + longitude.toString() + "timestamp" + ServerValue.TIMESTAMP
         )
     }
-
-
-    /*    @SuppressLint("MissingPermission")
-        override fun getLocationUpdates(interval: Long): Flow<Location> {
-            return callbackFlow {
-
-                val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-                val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-                if(!isGpsEnabled && !isNetworkEnabled) {
-                    throw LocationClient.LocationException("GPS is disabled")
-                }
-
-                val request = LocationRequest.create()
-                    .setInterval(interval)
-                    .setFastestInterval(interval)
-
-                val locationCallback = object : LocationCallback() {
-                    override fun onLocationResult(result: LocationResult) {
-                        super.onLocationResult(result)
-                        result.locations.lastOrNull()?.let { location ->
-                            launch { send(location) }
-                        }
-                    }
-                }
-
-                fusedLocationClient.requestLocationUpdates(
-                    request,
-                    locationCallback,
-                    Looper.getMainLooper()
-                )
-
-                awaitClose {
-                    fusedLocationClient.removeLocationUpdates(locationCallback)
-                }
-            }
-        }*/
 }
-/*   @SuppressLint("MissingPermission")
-    fun getCurrentLocation(callback: (LocationData?) -> Unit) {
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location: Location? ->
-                if (location != null) {
-                    val locationData = LocationData(location.latitude, location.longitude)
-                    callback(locationData)
-                } else {
-                    callback(null)
-                }
-            }
-            .addOnFailureListener { exception ->
-                callback(null)
-            }
-    }*/

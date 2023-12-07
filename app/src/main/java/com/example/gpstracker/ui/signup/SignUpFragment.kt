@@ -1,11 +1,14 @@
 package com.example.gpstracker.ui.signup
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
+import com.example.gpstracker.base.extentions.checkFieldsForButtonColor
 import com.example.gpstracker.base.extentions.hideKeyboard
 import com.example.gpstracker.base.extentions.openScreen
 import com.example.gpstracker.base.extentions.viewBinding
@@ -25,8 +28,31 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
         super.onViewCreated(view, savedInstanceState)
 
         viewModelInstantiation()
+        editTextChangeListener()
         registerUser()
         observeRegistration()
+    }
+
+    private fun editTextChangeListener() {
+        binding.emailEt.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(p0: Editable?) {
+                checkFieldsForButtonColor(binding.emailEt, binding.passwordEt, binding.submitBtn)
+            }
+        })
+
+        binding.passwordEt.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(p0: Editable?) {
+                checkFieldsForButtonColor(binding.emailEt, binding.passwordEt, binding.submitBtn)
+            }
+        })
     }
 
     private fun observeRegistration() {
@@ -66,5 +92,4 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
             }
         }
     }
-
 }

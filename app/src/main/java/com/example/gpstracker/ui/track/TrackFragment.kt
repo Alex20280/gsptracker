@@ -2,6 +2,7 @@ package com.example.gpstracker.ui.track
 
 import android.Manifest
 import android.animation.ValueAnimator
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -35,6 +36,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         startButtonClicked()
         observeTrackState()
         initAnimation()
+
     }
 
     private fun initAnimation() {
@@ -117,7 +119,34 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     }
 
     private fun startTrackLocation() {
-        trackViewModel.startTrackingService()
+        //trackViewModel.startTrackingService()
+        startTrackingService()
+    }
+
+    private fun startTrackingService(){
+        val isInternetConnected = trackViewModel.isInternetConnected()
+        val isGpsEnabled = trackViewModel.isLocationEnabled()
+
+        if(!isGpsEnabled) {
+
+            AlertDialog.Builder(requireContext())
+                .setTitle("GPS Disabled")
+                .setMessage("Please enable location services to allow tracking")
+                .setPositiveButton("Enable") { _, _ ->
+                    trackViewModel.requestLocationEnable()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+
+            return
+        }
+        if (isInternetConnected) {
+            trackViewModel.saveLocation()
+        } else {
+            trackViewModel.saveToRoomDatabase()
+        }
     }
 
     private fun stopTrackLocation() {

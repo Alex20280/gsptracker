@@ -4,11 +4,14 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.viewbinding.ViewBinding
+import com.example.gpstracker.R
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -32,7 +35,10 @@ fun <T : ViewBinding> Fragment.viewBinding(bind: (View) -> T): ReadOnlyProperty<
             return bind(view).also {
                 thisRef.viewLifecycleOwnerLiveData.observe(thisRef) { lifecycleOwner ->
                     lifecycleOwner.lifecycle.addObserver(object : LifecycleEventObserver {
-                        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                        override fun onStateChanged(
+                            source: LifecycleOwner,
+                            event: Lifecycle.Event
+                        ) {
                             if (event == Lifecycle.Event.ON_DESTROY) {
                                 binding = null
                             }
@@ -43,3 +49,18 @@ fun <T : ViewBinding> Fragment.viewBinding(bind: (View) -> T): ReadOnlyProperty<
             }
         }
     }
+
+fun checkFieldsForButtonColor(
+    emailEditText: EditText,
+    passwordEditText: EditText,
+    button: Button
+) {
+    val textEntered = emailEditText.text.isNotEmpty() &&
+            passwordEditText.text.isNotEmpty()
+
+    if(textEntered) {
+        button.setBackgroundColor(button.getContext().getColor(R.color.colorAccent))
+    } else {
+        button.setBackgroundColor(button.getContext().getColor(R.color.grey))
+    }
+}

@@ -1,16 +1,17 @@
 package com.example.gpstracker.ui.track.viewmodel
 
+import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.location.Location
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.provider.Settings
+import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
@@ -18,15 +19,12 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.example.gpstracker.prefs.DataStorePreference
+import com.example.gpstracker.repository.LocationTrackerRepository
 import com.example.gpstracker.roomdb.LocationModel
 import com.example.gpstracker.roomdb.LocationRepository
 import com.example.gpstracker.ui.service.TrackingService
 import com.example.gpstracker.ui.track.TrackerState
-import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
-import com.example.gpstracker.usecase.LocationTrackerUseCase
 import com.example.gpstracker.usecase.workManager.CustomWorker
-import com.google.firebase.database.DatabaseReference
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -36,12 +34,10 @@ import java.util.TimerTask
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
-    private val firebaseDatabase: DatabaseReference,
     private val application: Application,
-    private val locationRepository: LocationRepository,
-    private val locationTrackerUseCase: LocationTrackerUseCase,
-    private val workManager: WorkManager,
-    private val dataStorePreference: DataStorePreference
+    private val locationRepository: LocationTrackerRepository,
+    private val locationTracker: LocationRepository,
+    private val workManager: WorkManager
 ) : AndroidViewModel(application) {
 
     private var internetTimer: Timer? = null
@@ -51,19 +47,11 @@ class TrackViewModel @Inject constructor(
         return _stateLiveData
     }
 
-/*    suspend fun getDataStoreUID(): String? {
-        return viewModelScope.async {
-            dataStorePreference.getData("UID")
-        }.await()
-    }*/
-
-
     init {
         _stateLiveData.value = TrackerState.OFF
     }
 
-
-    private fun saveLocation() {
+     fun saveLocation() {
         Intent(application.applicationContext, TrackingService::class.java).also {
             it.action = TrackingService.Actions.START.toString()
             application.applicationContext.startForegroundService(it)
@@ -77,16 +65,31 @@ class TrackViewModel @Inject constructor(
         }
     }
 
-    fun startTrackingService() {
+/*    fun startTrackingService() {
         val isInternetConnected = isInternetConnected()
-        val isFirebaseConnected = isFirebaseDatabaseAvailable()
+        val isGpsEnabled = isLocationEnabled()
 
-        if (isInternetConnected && isFirebaseConnected) {
+        if(!isGpsEnabled) {
+
+            AlertDialog.Builder(application.applicationContext)
+                .setTitle("GPS Disabled")
+                .setMessage("Please enable location services to allow tracking")
+                .setPositiveButton("Enable") { _, _ ->
+                    requestLocationEnable()
+                }
+                .setNegativeButton("Cancel") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+
+            return
+        }
+        if (isInternetConnected) {
             saveLocation()
         } else {
             saveToRoomDatabase()
         }
-    }
+    }*/
 
     fun stopTrackInternetAvailability() {
         internetTimer?.cancel()
@@ -100,11 +103,11 @@ class TrackViewModel @Inject constructor(
             internetTimer?.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
                     val isInternetConnected = isInternetConnected()
-                    val isFirebaseConnected = isFirebaseDatabaseAvailable()
+                   // val isFirebaseConnected = isFirebaseDatabaseAvailable()
                     val currentState = getStateLiveData().value
-                    if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true && isFirebaseConnected == true) {
+                    if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true) {
                         _stateLiveData.postValue(TrackerState.ON)
-                    } else if (currentState == TrackerState.ON && (isInternetConnected == false || isFirebaseConnected == false)) {
+                    } else if (currentState == TrackerState.ON && (isInternetConnected == false)) {
                         _stateLiveData.postValue(TrackerState.DISCONNECTED)
                     }
                 }
@@ -112,7 +115,7 @@ class TrackViewModel @Inject constructor(
         }
     }
 
-    private fun isInternetConnected(): Boolean {
+    fun isInternetConnected(): Boolean {
         val connectivityManager =
             application.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkCapabilities = connectivityManager.activeNetwork ?: return false
@@ -121,14 +124,25 @@ class TrackViewModel @Inject constructor(
         return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
-
-    private fun isFirebaseDatabaseAvailable(): Boolean {
-        return firebaseDatabase != null
+    fun isLocationEnabled(): Boolean {
+        val locationManager = application.applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
-    private fun saveToRoomDatabase() {
-        locationTrackerUseCase.getCurrentLocation { locationData ->
-            if (locationData != null) {
+    fun requestLocationEnable() {
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        application.applicationContext.startActivity(intent)
+    }
+
+
+
+    /*    private fun isFirebaseDatabaseAvailable(): Boolean {
+            return firebaseDatabase != null
+        }*/
+
+    fun saveToRoomDatabase() {
+        locationRepository.getCurrentLocation { locationData ->
+            locationData?.let {
                 val timestamp = System.currentTimeMillis()
                 val locationModel = LocationModel(
                     latitude = locationData.latitude,
@@ -136,9 +150,8 @@ class TrackViewModel @Inject constructor(
                     timestamp = formatTimestamp(timestamp),
                     isSynchronized = false
                 )
-
                 viewModelScope.launch {
-                    locationRepository.saveGpsLocation(locationModel)
+                    locationTracker.saveGpsLocation(locationModel)
                 }
             }
         }

@@ -103,11 +103,11 @@ class TrackViewModel @Inject constructor(
             internetTimer?.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
                     val isInternetConnected = isInternetConnected()
-                   // val isFirebaseConnected = isFirebaseDatabaseAvailable()
+                    val isLocationEnabled = isLocationEnabled()
                     val currentState = getStateLiveData().value
-                    if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true) {
+                    if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true && isLocationEnabled == true) {
                         _stateLiveData.postValue(TrackerState.ON)
-                    } else if (currentState == TrackerState.ON && (isInternetConnected == false)) {
+                    } else if (currentState == TrackerState.ON && (isInternetConnected == false|| isLocationEnabled == false)) {
                         _stateLiveData.postValue(TrackerState.DISCONNECTED)
                     }
                 }

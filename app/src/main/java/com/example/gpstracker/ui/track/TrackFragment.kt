@@ -83,7 +83,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
 
                 TrackerState.DISCONNECTED -> {
                     changeCustomViewState(TrackerState.DISCONNECTED)
-                    buttonIsDisabled()
+                    buttonIsEnabled()
                     startWorkManager()
                     setTitleDisconnected()
                 }
@@ -105,7 +105,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
                         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                         LOCATION_PERMISSION_REQUEST_CODE
                     )
-                }else{
+                } else {
                     // Permission granted
                     isTracking = true
                     trackViewModel._stateLiveData.value = TrackerState.ON
@@ -118,28 +118,30 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         }
     }
 
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when(requestCode) {
+            LOCATION_PERMISSION_REQUEST_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    trackViewModel._stateLiveData.value = TrackerState.ON
+                    isTracking = true
+                }
+            }
+        }
+
+    }
+
     private fun startTrackLocation() {
         //trackViewModel.startTrackingService()
         startTrackingService()
     }
 
-    private fun startTrackingService(){
+    private fun startTrackingService() {
         val isInternetConnected = trackViewModel.isInternetConnected()
         val isGpsEnabled = trackViewModel.isLocationEnabled()
 
-        if(!isGpsEnabled) {
-
-            AlertDialog.Builder(requireContext())
-                .setTitle("GPS Disabled")
-                .setMessage("Please enable location services to allow tracking")
-                .setPositiveButton("Enable") { _, _ ->
-                    trackViewModel.requestLocationEnable()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
-
+        if (!isGpsEnabled) {
+            locationServiceDialogShow()
             return
         }
         if (isInternetConnected) {
@@ -147,6 +149,19 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         } else {
             trackViewModel.saveToRoomDatabase()
         }
+    }
+
+    private fun locationServiceDialogShow() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("GPS Disabled")
+            .setMessage("Please enable location services to allow tracking")
+            .setPositiveButton("Enable") { _, _ ->
+                trackViewModel.requestLocationEnable()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun stopTrackLocation() {

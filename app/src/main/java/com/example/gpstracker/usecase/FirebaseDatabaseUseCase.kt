@@ -42,7 +42,7 @@ class FirebaseDatabaseUseCase @Inject constructor(
     }
 
 
-    fun saveLocationFromRoomDatabase(latitude: Double, longitude: Double): Boolean {
+    fun isLocationSavedFromRoomDatabase(latitude: Double, longitude: Double): Boolean {
         saveLocationToFirebase(latitude, longitude)
         return true
     }

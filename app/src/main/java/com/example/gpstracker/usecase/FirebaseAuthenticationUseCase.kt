@@ -2,6 +2,7 @@ package com.example.gpstracker.usecase
 
 import com.example.gpstracker.network.ErrorDto
 import com.example.gpstracker.network.RequestResult
+import com.example.gpstracker.repository.FirebaseAuthenticationRepository
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
@@ -9,43 +10,21 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirebaseAuthenticationUseCase @Inject constructor(
-    private val auth: FirebaseAuth
+    private val firebaseAuthenticationRepository: FirebaseAuthenticationRepository
 ) {
-
     fun registerUser(email: String, password: String): RequestResult<Task<AuthResult>> {
-        return try {
-            val authResultTask = auth.createUserWithEmailAndPassword(email, password)
-            RequestResult.Success(authResultTask)
-        } catch (e: Exception) {
-            RequestResult.Error(ErrorDto.Default("Registration problem"), 0)
-        }
+        return firebaseAuthenticationRepository.registerUser(email, password)
     }
 
     suspend fun loginUser(email: String, password: String): RequestResult<AuthResult> {
-        return try {
-            val authResultTask = auth.signInWithEmailAndPassword(email, password)
-            authResultTask.await() // Wait for the task to complete
-            // If you reach this point, the task is considered successful
-            RequestResult.Success(authResultTask.result)
-        } catch (e: Exception) {
-            // Handle exceptions and errors here
-            RequestResult.Error(ErrorDto.Default(e.localizedMessage ?: "Login problem"), 0)
-        }
+        return firebaseAuthenticationRepository.loginUser(email, password)
     }
 
     fun resetPassword(email: String): Task<RequestResult<Unit>> {
-        val resetResultTask = auth.sendPasswordResetEmail(email)
-        return resetResultTask.continueWith { task ->
-            if (task.isSuccessful) {
-                RequestResult.Success(Unit)
-            } else {
-                RequestResult.Error(ErrorDto.Default("Reset problem"), 0)
-            }
-        }
+        return firebaseAuthenticationRepository.resetPassword(email)
     }
 
     fun getUserUd(): String? {
-        return auth.uid
+        return firebaseAuthenticationRepository.getUserUd()
     }
-
 }

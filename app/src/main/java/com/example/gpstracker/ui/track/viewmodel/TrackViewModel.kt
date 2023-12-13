@@ -1,6 +1,5 @@
 package com.example.gpstracker.ui.track.viewmodel
 
-import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.content.Intent
@@ -8,7 +7,6 @@ import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.provider.Settings
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -18,12 +16,12 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.example.gpstracker.prefs.DataStorePreference
-import com.example.gpstracker.repository.LocationTrackerRepository
+import com.example.gpstracker.repository.LocationTrackerRepositoryImpl
 import com.example.gpstracker.roomdb.LocationModel
 import com.example.gpstracker.roomdb.LocationRepository
 import com.example.gpstracker.ui.service.TrackingService
 import com.example.gpstracker.ui.track.TrackerState
+import com.example.gpstracker.usecase.CurrentLocationUseCase
 import com.example.gpstracker.usecase.workManager.CustomWorker
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -35,7 +33,7 @@ import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
     private val application: Application,
-    private val locationRepository: LocationTrackerRepository,
+    private val currentLocationUseCase: CurrentLocationUseCase,
     private val locationTracker: LocationRepository,
     private val workManager: WorkManager
 ) : AndroidViewModel(application) {
@@ -64,32 +62,6 @@ class TrackViewModel @Inject constructor(
             application.applicationContext.stopService(it)
         }
     }
-
-/*    fun startTrackingService() {
-        val isInternetConnected = isInternetConnected()
-        val isGpsEnabled = isLocationEnabled()
-
-        if(!isGpsEnabled) {
-
-            AlertDialog.Builder(application.applicationContext)
-                .setTitle("GPS Disabled")
-                .setMessage("Please enable location services to allow tracking")
-                .setPositiveButton("Enable") { _, _ ->
-                    requestLocationEnable()
-                }
-                .setNegativeButton("Cancel") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
-
-            return
-        }
-        if (isInternetConnected) {
-            saveLocation()
-        } else {
-            saveToRoomDatabase()
-        }
-    }*/
 
     fun stopTrackInternetAvailability() {
         internetTimer?.cancel()
@@ -134,14 +106,8 @@ class TrackViewModel @Inject constructor(
         application.applicationContext.startActivity(intent)
     }
 
-
-
-    /*    private fun isFirebaseDatabaseAvailable(): Boolean {
-            return firebaseDatabase != null
-        }*/
-
     fun saveToRoomDatabase() {
-        locationRepository.getCurrentLocation { locationData ->
+        currentLocationUseCase.getCurrentLocation { locationData ->
             locationData?.let {
                 val timestamp = System.currentTimeMillis()
                 val locationModel = LocationModel(

@@ -1,6 +1,10 @@
 package com.example.gpstracker.di
 
 import android.content.Context
+import com.example.gpstracker.repository.FirebaseAuthenticationRepository
+import com.example.gpstracker.repository.FirebaseAuthenticationRepositoryImpl
+import com.example.gpstracker.repository.LocationTrackerRepository
+import com.example.gpstracker.repository.LocationTrackerRepositoryImpl
 import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -27,6 +31,18 @@ object LocationServiceModule {
     @Singleton
     fun provideFirebaseDatabase(): DatabaseReference {
         return FirebaseDatabase.getInstance().reference.child("locations")
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationTrackerRepository(impl: LocationTrackerRepositoryImpl): LocationTrackerRepository {
+        return impl
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuthenticationRepository(impl: FirebaseAuthenticationRepositoryImpl): FirebaseAuthenticationRepository {
+        return impl
     }
 
 }

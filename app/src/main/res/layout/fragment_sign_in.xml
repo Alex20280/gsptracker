@@ -94,6 +94,7 @@
         android:layout_marginTop="46dp"
         android:textColor="@color/white"
         android:text="@string/sign_in"
+        android:enabled="false"
         android:backgroundTint="@color/grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

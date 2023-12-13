@@ -6,6 +6,8 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -55,12 +57,28 @@ fun checkFieldsForButtonColor(
     passwordEditText: EditText,
     button: Button
 ) {
-    val textEntered = emailEditText.text.isNotEmpty() &&
-            passwordEditText.text.isNotEmpty()
+    val email = emailEditText.text.toString().trim()
+    val password = passwordEditText.text.toString().trim()
 
-    if(textEntered) {
+    val isEmailValid =
+        android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && email.endsWith(".com")
+    val isPasswordValid = password.isNotEmpty()
+
+    val isDataValid = isEmailValid && isPasswordValid
+
+    if (isDataValid) {
         button.setBackgroundColor(button.getContext().getColor(R.color.colorAccent))
+        enableButton(button)
     } else {
         button.setBackgroundColor(button.getContext().getColor(R.color.grey))
+        disableButton(button)
     }
+}
+
+private fun enableButton(button: Button) {
+    button.isEnabled = true
+}
+
+private fun disableButton(button: Button) {
+    button.isEnabled = false
 }

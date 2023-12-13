@@ -43,7 +43,6 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
 
         val centerX = width / 2f
         val centerY = height / 2f
-        val radius = Math.min(centerX, centerY)
 
         // Draw the image in the center
         val imageLeft = centerX - image.width / 2.4
@@ -99,7 +98,9 @@ class StatefulCircleView(context: Context, attrs: AttributeSet) : View(context, 
             }
 
             TrackerState.DISCONNECTED -> {
+
                 canvas.drawBitmap(badgeImageExclamationMark, null, RectF(disconnectedBadgeLeft.toFloat(), disconnectedBadgeTop, disconnectedBadgeRight.toFloat(), disconnectedBadgeBottom), null)
+
                 //progressBar
                 paint.color = context.resources.getColor(R.color.red)
                 canvas.drawArc(rectF, 0f, 360f, false, paint)

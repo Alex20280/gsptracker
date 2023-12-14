@@ -37,7 +37,7 @@ class TrackingService : Service() {
     private fun startServiceTracking() {
         locationJob = serviceScope.launch {
             while (isActive) {
-                locationServiceUseCase.saveLocation()
+                locationServiceUseCase.saveLocationToFirebase()
                 delay(com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS)
             }
         }

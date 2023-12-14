@@ -84,8 +84,10 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
                 TrackerState.DISCONNECTED -> {
                     changeCustomViewState(TrackerState.DISCONNECTED)
                     buttonIsEnabled()
+                    stopTrackLocation()
                     startWorkManager()
                     setTitleDisconnected()
+                    isTracking = false
                 }
             }
         }
@@ -132,7 +134,6 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     }
 
     private fun startTrackLocation() {
-        //trackViewModel.startTrackingService()
         startTrackingService()
     }
 
@@ -170,7 +171,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
 
 
     private fun trackInternetAvailability() {
-        trackViewModel.startTrackInternetAvailability()
+        trackViewModel.startTrackGpsAvailability()
     }
 
     private fun stopTrackInternetAvailability() {

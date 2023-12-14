@@ -29,7 +29,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
 
         viewModelInstantiation()
         editTextChangeListener()
-        registerUser()
+        registerButtonListener()
         observeRegistration()
     }
 
@@ -73,7 +73,7 @@ class SignUpFragment : Fragment(R.layout.fragment_sign_up) {
         (requireContext().applicationContext as App).appComponent.inject(this)
     }
 
-    private fun registerUser() {
+    private fun registerButtonListener() {
         binding.submitBtn.setOnClickListener {
             hideKeyboard()
             val email: String = binding.emailEt.text?.toString() ?: ""

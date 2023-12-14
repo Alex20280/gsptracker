@@ -1,6 +1,6 @@
-val trackingIntervalDebug: String = "10000L"
+val trackingIntervalDebug: String = "10000L" //
 val trackingIntervalRelease: String = "600000L"
-val trackingIntervalMetersDebug: String = "10"
+val trackingIntervalMetersDebug: String = "60"  //10
 val trackingIntervalMetersRelease: String = "60"
 
 plugins {
@@ -70,18 +70,6 @@ android {
             useLegacyPackaging = true
         }
     }
-
-/*    productFlavors {
-        create("debug") {
-            dimension = "version"
-            buildConfigField("Long", "TRACKING_INTERVAL_MILLIS", trackingIntervalDebug)
-            applicationIdSuffix = ".debug"
-        }
-        create("release") {
-            dimension = "version"
-            buildConfigField("Long", "TRACKING_INTERVAL_MILLIS", trackingIntervalRelease)
-        }
-    }*/
 
 }
 

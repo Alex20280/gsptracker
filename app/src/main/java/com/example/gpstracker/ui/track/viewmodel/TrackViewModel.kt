@@ -16,7 +16,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.example.gpstracker.repository.LocationTrackerRepositoryImpl
 import com.example.gpstracker.roomdb.LocationModel
 import com.example.gpstracker.roomdb.LocationRepository
 import com.example.gpstracker.ui.service.TrackingService
@@ -68,18 +67,20 @@ class TrackViewModel @Inject constructor(
         internetTimer = null
     }
 
-    fun startTrackInternetAvailability() {
+    fun startTrackGpsAvailability() {
         if (internetTimer == null) {
             internetTimer = Timer()
-            val trackingIntervalMillis = 5000L//600000L  // 5 minutes
+            val trackingIntervalMillis = 5000L // 5 sec
             internetTimer?.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
-                    val isInternetConnected = isInternetConnected()
+                   // val isInternetConnected = isInternetConnected()
                     val isLocationEnabled = isLocationEnabled()
                     val currentState = getStateLiveData().value
-                    if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true && isLocationEnabled == true) {
-                        _stateLiveData.postValue(TrackerState.ON)
-                    } else if (currentState == TrackerState.ON && (isInternetConnected == false|| isLocationEnabled == false)) {
+                    //if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true && isLocationEnabled == true) {
+                    if (currentState == TrackerState.DISCONNECTED && isLocationEnabled == true) {
+                       _stateLiveData.postValue(TrackerState.OFF)
+                 //   } else if (currentState == TrackerState.ON && (isInternetConnected == false|| isLocationEnabled == false)) {
+                    } else if (currentState == TrackerState.ON &&  isLocationEnabled == false) {
                         _stateLiveData.postValue(TrackerState.DISCONNECTED)
                     }
                 }

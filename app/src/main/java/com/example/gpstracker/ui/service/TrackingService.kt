@@ -23,8 +23,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 class TrackingService : Service() {
@@ -110,11 +114,13 @@ class TrackingService : Service() {
         serviceScope.launch {
             currentLocationUseCase.getCurrentLocation { locationData ->
                 locationData?.let {
-                    val timestamp = System.currentTimeMillis()
+                    val currentTime = LocalDateTime.now()
+
                     val locationModel = LocationModel(
                         latitude = locationData.latitude,
                         longitude = locationData.longitude,
-                        timestamp = formatTimestamp(timestamp),
+                        //timestamp = formatTimestamp(timestamp),
+                        timestamp = localDateTimeToTimestamp(currentTime),
                         isSynchronized = false
                     )
                     serviceScope.launch {
@@ -125,11 +131,16 @@ class TrackingService : Service() {
         }
     }
 
-    private fun formatTimestamp(timestamp: Long): String {
+    private fun localDateTimeToTimestamp(localDateTime: LocalDateTime): Long {
+        val instant = localDateTime.toInstant(ZoneOffset.UTC) // Convert to Instant
+        return instant.toEpochMilli() // Extract milliseconds since epoch
+    }
+
+/*    private fun formatTimestamp(timestamp: Long): String {
         val date = Date(timestamp)
         val dateFormat = SimpleDateFormat("HH:mm dd MMM yyyy", Locale.getDefault())
         return dateFormat.format(date)
-    }
+    }*/
 
     private fun isInternetConnected(): Boolean {
         val connectivityManager =

@@ -11,20 +11,29 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ServerValue
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
 class LocationSavingRepositoryImpl @Inject constructor(
     private val fusedLocationClient: FusedLocationProviderClient,
     private val database: DatabaseReference
-): LocationSavingRepository() {
+) : LocationSavingRepository() {
 
     @SuppressLint("MissingPermission")
     override suspend fun saveLocationToFirebase() {
-        Log.d("LocationUpdate", "executed")
         val locationRequest = LocationRequest().apply {
             interval = com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS //10 sec
             fastestInterval = com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS //10 sec
-            smallestDisplacement = com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_METERS.toFloat() //60 meters
+            smallestDisplacement =
+                com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_METERS.toFloat() //60 meters
         }
 
         val locationCallback = object : LocationCallback() {
@@ -32,33 +41,38 @@ class LocationSavingRepositoryImpl @Inject constructor(
                 Log.d("LocationUpdate", "Got location result: $locationResult")
                 locationResult.locations.let { locations ->
                     val location = locations.last()
-                    saveLocationToFirebase(location.latitude, location.longitude)
+                    saveLocationFromRoomDbToFirebase(location.latitude, location.longitude)
                 }
             }
 
         }
-        val result = fusedLocationClient.requestLocationUpdates(
+        fusedLocationClient.requestLocationUpdates(
             locationRequest,
             locationCallback,
             Looper.myLooper()
         )
-        //TODO: remove
-        result.addOnFailureListener {
-            Log.e("MyLocation", "Failed to request updates", it)
-        }
-
-        //TODO: remove
-        result.addOnSuccessListener {
-            Log.i("MyLocation", "Successfully requested updates")
-        }
     }
 
-    override suspend fun isLocationSavedFromRoomDatabase(latitude: Double, longitude: Double): Boolean {
-        saveLocationToFirebase(latitude, longitude)
+    override suspend fun isLocationSavedFromRoomDatabase(
+        latitude: Double,
+        longitude: Double,
+        time: Long
+    ): Boolean {
+        saveLocationFromRoomDbToFirebase(latitude, longitude, time)
         return true
     }
 
-    private fun saveLocationToFirebase(latitude: Double, longitude: Double) {
+    private fun saveLocationFromRoomDbToFirebase(
+        latitude: Double,
+        longitude: Double,
+        time: Any = LocalDateTime.now()
+    ) {
+        val currentTime = when (time) {
+            is Long -> time
+            is LocalDateTime -> localDateTimeToTimestamp(time)
+            else -> localDateTimeToTimestamp(LocalDateTime.now())
+        }
+
         // Reference the "locations" node with the user's ID
         val userId = Firebase.auth.currentUser
         val userLocationsRef = database.child(userId?.uid.toString())
@@ -67,19 +81,19 @@ class LocationSavingRepositoryImpl @Inject constructor(
         val locationEntry = userLocationsRef.push()
 
         // Set the latitude and longitude data for this location entry
-        //val locationData = LocationData(latitude, longitude)
-
-        val locationData = HashMap<String, Any>()
-        locationData["latitude"] = latitude
-        locationData["longitude"] = longitude
-        locationData["timestamp"] = ServerValue.TIMESTAMP
-        locationEntry.setValue(locationData)
-
-        Log.d(
-            "myLoccation",
-            userId.toString() + latitude.toString() + "longitude" + longitude.toString() + "timestamp" + ServerValue.TIMESTAMP
+        val locationData = hashMapOf(
+            "latitude" to latitude,
+            "longitude" to longitude,
+            "timestamp" to currentTime
         )
+        locationEntry.setValue(locationData)
     }
+
+    private fun localDateTimeToTimestamp(localDateTime: LocalDateTime): Long {
+        val instant = localDateTime.toInstant(ZoneOffset.UTC) // Convert to Instant
+        return instant.toEpochMilli() // Extract milliseconds since epoch
+    }
+
 }
 
 

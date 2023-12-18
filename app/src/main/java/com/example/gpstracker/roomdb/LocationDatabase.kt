@@ -11,7 +11,7 @@ abstract class LocationDatabase : RoomDatabase() {
     abstract val locationDao: LocationDao
 
     companion object {
-        const val VERSION_DATABASE = 1
+        const val VERSION_DATABASE = 2
         const val DATABASE_NAME = "gps_location_db"
     }
 }

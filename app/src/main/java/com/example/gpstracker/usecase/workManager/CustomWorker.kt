@@ -29,13 +29,14 @@ class CustomWorker(
             for (location in result) {
                 // Step 2: Send unsynchronized data to Firebase
                 Log.d("MyworkManagerRun",location.id.toString() + "time: " + location.timestamp + "sync: " + location.isSynchronized.toString())
-                val success = locationServiceUseCase.isLocationSavedFromRoomDatabase(location.latitude, location.longitude)
+                val success = locationServiceUseCase.isLocationSavedFromRoomDatabase(location.latitude, location.longitude, location.timestamp)
 
                 if (success) {
                     // Mark the location as synchronized if it was sent successfully
                     locationRepository.markLocationAsSynchronizedBasedOnId(location.id)
                 }
             }
+
             Log.d("MyWorkerJob", "success")
             Result.success()
         } catch (e: Exception) {

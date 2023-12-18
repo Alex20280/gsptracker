@@ -1,6 +1,7 @@
 package com.example.gpstracker.usecase
 
 import com.example.gpstracker.repository.LocationSavingRepository
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 class FirebaseDatabaseUseCase @Inject constructor(
@@ -10,7 +11,7 @@ class FirebaseDatabaseUseCase @Inject constructor(
         locationSaveRepository.saveLocationToFirebase()
     }
 
-    suspend fun isLocationSavedFromRoomDatabase(latitude: Double, longitude: Double): Boolean {
-        return locationSaveRepository.isLocationSavedFromRoomDatabase(latitude, longitude)
+    suspend fun isLocationSavedFromRoomDatabase(latitude: Double, longitude: Double, time: Long): Boolean {
+        return locationSaveRepository.isLocationSavedFromRoomDatabase(latitude, longitude, time)
     }
 }

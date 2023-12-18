@@ -13,7 +13,7 @@ data class LocationModel(
     @ColumnInfo(name = "longitude")
     val longitude: Double,
     @ColumnInfo(name = "timestamp")
-    val timestamp: String,
+    val timestamp: Long,
     @ColumnInfo(name = "isSynchronized")
     var isSynchronized: Boolean = false
 )

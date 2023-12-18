@@ -7,15 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpstracker.network.RequestResult
 import com.example.gpstracker.prefs.DataStorePreference
-import com.example.gpstracker.prefs.UserPreferences
-import com.example.gpstracker.usecase.FirebaseAuthenticationUseCase
-import com.google.android.gms.tasks.Task
+import com.example.gpstracker.usecase.GetUserUidUseCase
+import com.example.gpstracker.usecase.LoginUserUseCase
 import com.google.firebase.auth.AuthResult
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SignInViewModel @Inject constructor(
-    private val firebaseAuthenticationUseCase: FirebaseAuthenticationUseCase,
+    private val loginUserUseCase: LoginUserUseCase,
+    private val getUserUidUseCase: GetUserUidUseCase,
     private val dataStorePreference: DataStorePreference
 ): ViewModel() {
 
@@ -26,7 +26,7 @@ class SignInViewModel @Inject constructor(
 
     fun loginUser(email: String, password: String) {
         viewModelScope.launch {
-            val response = firebaseAuthenticationUseCase.loginUser(email, password)
+            val response = loginUserUseCase.loginUser(email, password)
             Log.d("logCred", email + password)
             checkEmailResponse(response)
         }
@@ -39,7 +39,7 @@ class SignInViewModel @Inject constructor(
                         // Handle successful login
                         // You can update your UI or perform other actions here
                         signInResult.value = response
-                        saveUserId(firebaseAuthenticationUseCase.getUserUd().toString())
+                        saveUserId(getUserUidUseCase.getUserUid().toString())
                     }
                     is RequestResult.Error -> {
                         // Handle login error

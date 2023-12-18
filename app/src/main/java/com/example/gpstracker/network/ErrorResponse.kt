@@ -1,12 +1,12 @@
 package com.example.gpstracker.network
 
-sealed interface ErrorDto {
+sealed interface ErrorResponse {
 
     fun getErrorMessage(): String
 
     data class Default(
         val message: String
-    ) : ErrorDto {
+    ) : ErrorResponse {
         override fun getErrorMessage() = message
     }
 
@@ -14,7 +14,7 @@ sealed interface ErrorDto {
         val message: String,
         val status: String? = null,
         val error: String? = null
-    ) : ErrorDto {
+    ) : ErrorResponse {
         override fun getErrorMessage() = message
     }
 }

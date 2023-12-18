@@ -10,34 +10,27 @@ import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.example.gpstracker.roomdb.LocationModel
 import com.example.gpstracker.roomdb.LocationRepository
 import com.example.gpstracker.ui.service.TrackingService
 import com.example.gpstracker.ui.track.TrackerState
-import com.example.gpstracker.usecase.CurrentLocationUseCase
 import com.example.gpstracker.usecase.workManager.CustomWorker
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import java.util.Timer
 import java.util.TimerTask
 import javax.inject.Inject
 
 class TrackViewModel @Inject constructor(
     private val application: Application,
-    private val currentLocationUseCase: CurrentLocationUseCase,
-    private val locationTracker: LocationRepository,
     private val workManager: WorkManager
 ) : AndroidViewModel(application) {
 
+    private var gpsTimer: Timer? = null
     private var internetTimer: Timer? = null
+    private var internetOfflineSyncTriggered = false
 
     val _stateLiveData = MutableLiveData<TrackerState>()
     fun getStateLiveData(): LiveData<TrackerState> {
@@ -48,7 +41,7 @@ class TrackViewModel @Inject constructor(
         _stateLiveData.value = TrackerState.OFF
     }
 
-     fun saveLocation() {
+    fun startTrackingService() {
         Intent(application.applicationContext, TrackingService::class.java).also {
             it.action = TrackingService.Actions.START.toString()
             application.applicationContext.startForegroundService(it)
@@ -62,25 +55,30 @@ class TrackViewModel @Inject constructor(
         }
     }
 
-    fun stopTrackInternetAvailability() {
+    fun stopTrackGpsAvailabilityCheck() {
+        gpsTimer?.cancel()
+        gpsTimer = null
+    }
+
+    fun stopInternetAvailabilityCheck() {
         internetTimer?.cancel()
         internetTimer = null
     }
 
     fun startTrackGpsAvailability() {
-        if (internetTimer == null) {
-            internetTimer = Timer()
+        if (gpsTimer == null) {
+            gpsTimer = Timer()
             val trackingIntervalMillis = 5000L // 5 sec
-            internetTimer?.scheduleAtFixedRate(object : TimerTask() {
+            gpsTimer?.scheduleAtFixedRate(object : TimerTask() {
                 override fun run() {
-                   // val isInternetConnected = isInternetConnected()
+                    // val isInternetConnected = isInternetConnected()
                     val isLocationEnabled = isLocationEnabled()
                     val currentState = getStateLiveData().value
                     //if (currentState == TrackerState.DISCONNECTED && isInternetConnected == true && isLocationEnabled == true) {
                     if (currentState == TrackerState.DISCONNECTED && isLocationEnabled == true) {
-                       _stateLiveData.postValue(TrackerState.OFF)
-                 //   } else if (currentState == TrackerState.ON && (isInternetConnected == false|| isLocationEnabled == false)) {
-                    } else if (currentState == TrackerState.ON &&  isLocationEnabled == false) {
+                        _stateLiveData.postValue(TrackerState.OFF)
+                        //   } else if (currentState == TrackerState.ON && (isInternetConnected == false|| isLocationEnabled == false)) {
+                    } else if (currentState == TrackerState.ON && isLocationEnabled == false) {
                         _stateLiveData.postValue(TrackerState.DISCONNECTED)
                     }
                 }
@@ -98,36 +96,14 @@ class TrackViewModel @Inject constructor(
     }
 
     fun isLocationEnabled(): Boolean {
-        val locationManager = application.applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationManager =
+            application.applicationContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
     fun requestLocationEnable() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         application.applicationContext.startActivity(intent)
-    }
-
-    fun saveToRoomDatabase() {
-        currentLocationUseCase.getCurrentLocation { locationData ->
-            locationData?.let {
-                val timestamp = System.currentTimeMillis()
-                val locationModel = LocationModel(
-                    latitude = locationData.latitude,
-                    longitude = locationData.longitude,
-                    timestamp = formatTimestamp(timestamp),
-                    isSynchronized = false
-                )
-                viewModelScope.launch {
-                    locationTracker.saveGpsLocation(locationModel)
-                }
-            }
-        }
-    }
-
-    private fun formatTimestamp(timestamp: Long): String {
-        val date = Date(timestamp)
-        val dateFormat = SimpleDateFormat("HH:mm dd MMM yyyy", Locale.getDefault())
-        return dateFormat.format(date)
     }
 
     fun syncLocalDatabaseAndRemoteDatabase() {
@@ -140,6 +116,25 @@ class TrackViewModel @Inject constructor(
             .build()
 
         workManager.beginUniqueWork("Worker", ExistingWorkPolicy.REPLACE, syncDataRequest).enqueue()
+    }
+
+    fun startTrackInternetAvailability() {
+        if (internetTimer == null) {
+            internetTimer = Timer()
+            val trackingIntervalMillis = 10000L
+            internetTimer?.scheduleAtFixedRate(object : TimerTask() {
+                override fun run() {
+                    val isInternetAvailable = isInternetConnected()
+                    if (!isInternetAvailable && !internetOfflineSyncTriggered) {
+                        internetOfflineSyncTriggered = true
+                        syncLocalDatabaseAndRemoteDatabase() // Start workmanager
+                    }
+                    else if (isInternetAvailable) {
+                        internetOfflineSyncTriggered = false
+                    }
+                }
+            }, 0, trackingIntervalMillis)
+        }
     }
 
 }

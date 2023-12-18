@@ -24,14 +24,11 @@ class CustomWorker(
     lateinit var locationRepository: LocationRepository
 
     override suspend fun doWork(): Result {
-
-        Log.d("SomeCustoWorkerm", "working")
         return try {
             val result = locationRepository.getUnsynchronizedLocations()
-
             for (location in result) {
                 // Step 2: Send unsynchronized data to Firebase
-                Log.d("MyworkManagerRun",location.id.toString() + "long: " + location.latitude + "sync: " + location.isSynchronized.toString())
+                Log.d("MyworkManagerRun",location.id.toString() + "time: " + location.timestamp + "sync: " + location.isSynchronized.toString())
                 val success = locationServiceUseCase.isLocationSavedFromRoomDatabase(location.latitude, location.longitude)
 
                 if (success) {
@@ -39,12 +36,6 @@ class CustomWorker(
                     locationRepository.markLocationAsSynchronizedBasedOnId(location.id)
                 }
             }
-
-/*            val allLocations = locationRepository.getAllLocations()
-            for (myLocations in allLocations) {
-                Log.d("MyworkManagerRun",myLocations.id.toString() + "long: " + myLocations.latitude + "sync: " + myLocations.isSynchronized.toString())
-            }*/
-
             Log.d("MyWorkerJob", "success")
             Result.success()
         } catch (e: Exception) {

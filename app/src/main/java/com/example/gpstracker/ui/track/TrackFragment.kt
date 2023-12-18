@@ -56,9 +56,6 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         valueAnimator.cancel()
     }
 
-    private fun startWorkManager() {
-        trackViewModel.syncLocalDatabaseAndRemoteDatabase()
-    }
 
     private fun observeTrackState() {
         trackViewModel.getStateLiveData().observe(viewLifecycleOwner) { state ->
@@ -67,7 +64,8 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
                     changeCustomViewState(TrackerState.ON)
                     buttonIsDisabled()
                     startTrackLocation()
-                    trackInternetAvailability()
+                    trackGpsAvailability()
+                    startTrackInternetAvailability()
                     setTitleOn()
                     startCircleAnimation()
                 }
@@ -75,17 +73,16 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
                 TrackerState.OFF -> {
                     changeCustomViewState(TrackerState.OFF)
                     buttonIsEnabled()
-                    stopTrackInternetAvailability()
+                    stopTrackGpsAvailability()
                     stopTrackLocation()
                     setTitleOff()
+                    stopTrackInternetAvailability()
                     stopCircleAnimation()
                 }
 
                 TrackerState.DISCONNECTED -> {
                     changeCustomViewState(TrackerState.DISCONNECTED)
                     buttonIsEnabled()
-                    stopTrackLocation()
-                    startWorkManager()
                     setTitleDisconnected()
                     isTracking = false
                 }
@@ -130,26 +127,15 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
                 }
             }
         }
-
     }
 
     private fun startTrackLocation() {
-        startTrackingService()
-    }
-
-    private fun startTrackingService() {
-        val isInternetConnected = trackViewModel.isInternetConnected()
         val isGpsEnabled = trackViewModel.isLocationEnabled()
-
         if (!isGpsEnabled) {
             locationServiceDialogShow()
             return
         }
-        if (isInternetConnected) {
-            trackViewModel.saveLocation()
-        } else {
-            trackViewModel.saveToRoomDatabase()
-        }
+        trackViewModel.startTrackingService()
     }
 
     private fun locationServiceDialogShow() {
@@ -170,12 +156,20 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     }
 
 
-    private fun trackInternetAvailability() {
+    private fun trackGpsAvailability() {
         trackViewModel.startTrackGpsAvailability()
     }
 
-    private fun stopTrackInternetAvailability() {
-        trackViewModel.stopTrackInternetAvailability()
+    private fun stopTrackGpsAvailability() {
+        trackViewModel.stopTrackGpsAvailabilityCheck()
+    }
+
+    private fun startTrackInternetAvailability(){
+        trackViewModel.startTrackInternetAvailability()
+    }
+
+    private fun stopTrackInternetAvailability(){
+        trackViewModel.stopInternetAvailabilityCheck()
     }
 
     private fun viewModelInstantiation() {

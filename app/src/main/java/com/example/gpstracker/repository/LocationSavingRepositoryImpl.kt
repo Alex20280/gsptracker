@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Looper
 import android.util.Log
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
@@ -14,13 +13,13 @@ import com.google.firebase.database.ServerValue
 import com.google.firebase.ktx.Firebase
 import javax.inject.Inject
 
-class LocationSaveRepositoryImpl @Inject constructor(
+class LocationSavingRepositoryImpl @Inject constructor(
     private val fusedLocationClient: FusedLocationProviderClient,
     private val database: DatabaseReference
-): LocationSaveRepository() {
+): LocationSavingRepository() {
 
     @SuppressLint("MissingPermission")
-    override fun saveLocationToFirebase() {
+    override suspend fun saveLocationToFirebase() {
         Log.d("LocationUpdate", "executed")
         val locationRequest = LocationRequest().apply {
             interval = com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS //10 sec
@@ -54,7 +53,7 @@ class LocationSaveRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun isLocationSavedFromRoomDatabase(latitude: Double, longitude: Double): Boolean {
+    override suspend fun isLocationSavedFromRoomDatabase(latitude: Double, longitude: Double): Boolean {
         saveLocationToFirebase(latitude, longitude)
         return true
     }

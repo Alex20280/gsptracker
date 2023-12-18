@@ -1,19 +1,18 @@
 package com.example.gpstracker.ui.signup.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gpstracker.network.RequestResult
-import com.example.gpstracker.usecase.FirebaseAuthenticationUseCase
+import com.example.gpstracker.usecase.RegisterUserUseCase
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SignUpViewModel @Inject constructor(
-    private val registrationUseCase: FirebaseAuthenticationUseCase
+    private val registrationUseCase: RegisterUserUseCase
 ) : ViewModel() {
 
     private val signUpResult = MutableLiveData<RequestResult<Task<AuthResult>>>()

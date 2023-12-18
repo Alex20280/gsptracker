@@ -1,12 +1,12 @@
 package com.example.gpstracker.di
 
 import android.content.Context
-import com.example.gpstracker.repository.FirebaseAuthenticationRepository
-import com.example.gpstracker.repository.FirebaseAuthenticationRepositoryImpl
-import com.example.gpstracker.repository.LocationSaveRepository
-import com.example.gpstracker.repository.LocationSaveRepositoryImpl
-import com.example.gpstracker.repository.LocationTrackerRepository
-import com.example.gpstracker.repository.LocationTrackerRepositoryImpl
+import com.example.gpstracker.repository.AuthenticationRepository
+import com.example.gpstracker.repository.AuthenticationRepositoryImpl
+import com.example.gpstracker.repository.LocationSavingRepository
+import com.example.gpstracker.repository.LocationSavingRepositoryImpl
+import com.example.gpstracker.repository.LocationTrackingRepository
+import com.example.gpstracker.repository.LocationTrackingRepositoryImpl
 import com.example.gpstracker.usecase.FirebaseDatabaseUseCase
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -20,7 +20,7 @@ import javax.inject.Singleton
 object LocationServiceModule {
 
     @Provides
-    fun provideLocationServiceUseCase(locationSaveRepositoryImpl: LocationSaveRepositoryImpl): FirebaseDatabaseUseCase {
+    fun provideLocationServiceUseCase(locationSaveRepositoryImpl: LocationSavingRepositoryImpl): FirebaseDatabaseUseCase {
         return FirebaseDatabaseUseCase(locationSaveRepositoryImpl)
     }
 
@@ -37,19 +37,19 @@ object LocationServiceModule {
 
     @Provides
     @Singleton
-    fun provideLocationTrackerRepository(impl: LocationTrackerRepositoryImpl): LocationTrackerRepository {
+    fun provideLocationTrackerRepository(impl: LocationTrackingRepositoryImpl): LocationTrackingRepository {
         return impl
     }
 
     @Provides
     @Singleton
-    fun provideFirebaseAuthenticationRepository(impl: FirebaseAuthenticationRepositoryImpl): FirebaseAuthenticationRepository {
+    fun provideFirebaseAuthenticationRepository(impl: AuthenticationRepositoryImpl): AuthenticationRepository {
         return impl
     }
 
     @Provides
     @Singleton
-    fun provideLocationSaveRepository(impl: LocationSaveRepositoryImpl): LocationSaveRepository {
+    fun provideLocationSaveRepository(impl: LocationSavingRepositoryImpl): LocationSavingRepository {
         return impl
     }
 

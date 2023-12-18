@@ -3,7 +3,7 @@ package com.example.gpstracker.di
 import android.content.Context
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.example.gpstracker.repository.LocationTrackerRepositoryImpl
+import com.example.gpstracker.repository.LocationTrackingRepositoryImpl
 import com.example.gpstracker.usecase.workManager.CustomWorker
 import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.Module
@@ -31,7 +31,7 @@ object WorkManagerModule {
     }
 
     @Provides
-    fun provideLocationTrackerUseCase(fusedLocationClient: FusedLocationProviderClient): LocationTrackerRepositoryImpl {
-        return LocationTrackerRepositoryImpl(fusedLocationClient)
+    fun provideLocationTrackerUseCase(fusedLocationClient: FusedLocationProviderClient): LocationTrackingRepositoryImpl {
+        return LocationTrackingRepositoryImpl(fusedLocationClient)
     }
 }

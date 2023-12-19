@@ -7,19 +7,10 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ServerValue
-import com.google.firebase.ktx.Firebase
-import java.text.SimpleDateFormat
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
 import javax.inject.Inject
 
 class LocationSavingRepositoryImpl @Inject constructor(
@@ -74,19 +65,17 @@ class LocationSavingRepositoryImpl @Inject constructor(
         }
 
         // Reference the "locations" node with the user's ID
-        val userId = Firebase.auth.currentUser
-        val userLocationsRef = database.child(userId?.uid.toString())
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
 
-        // Create a new location entry with a unique key
-        val locationEntry = userLocationsRef.push()
+        val userRef = database.child(userId!!)
+        val locationRef = userRef.child(currentTime.toString())
 
-        // Set the latitude and longitude data for this location entry
-        val locationData = hashMapOf(
-            "latitude" to latitude,
-            "longitude" to longitude,
-            "timestamp" to currentTime
+        val location = hashMapOf<String, Any>(
+            "lat" to latitude,
+            "long" to longitude
         )
-        locationEntry.setValue(locationData)
+
+        locationRef.setValue(location)
     }
 
     private fun localDateTimeToTimestamp(localDateTime: LocalDateTime): Long {

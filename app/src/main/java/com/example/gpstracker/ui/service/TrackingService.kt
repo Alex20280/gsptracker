@@ -55,15 +55,6 @@ class TrackingService : Service() {
         return null
     }
 
-/*    private fun saveToFirebase() {
-        locationJob = serviceScope.launch {
-            while (isActive) {
-                locationServiceUseCase.saveLocationToFirebase()
-                delay(com.example.gpstracker.BuildConfig.TRACKING_INTERVAL_MILLIS)
-            }
-        }
-    }*/
-
     private fun stopService(){
         serviceScope.cancel()
     }
@@ -115,11 +106,9 @@ class TrackingService : Service() {
             currentLocationUseCase.getCurrentLocation { locationData ->
                 locationData?.let {
                     val currentTime = LocalDateTime.now()
-
                     val locationModel = LocationModel(
                         latitude = locationData.latitude,
                         longitude = locationData.longitude,
-                        //timestamp = formatTimestamp(timestamp),
                         timestamp = localDateTimeToTimestamp(currentTime),
                         isSynchronized = false
                     )
@@ -135,12 +124,6 @@ class TrackingService : Service() {
         val instant = localDateTime.toInstant(ZoneOffset.UTC) // Convert to Instant
         return instant.toEpochMilli() // Extract milliseconds since epoch
     }
-
-/*    private fun formatTimestamp(timestamp: Long): String {
-        val date = Date(timestamp)
-        val dateFormat = SimpleDateFormat("HH:mm dd MMM yyyy", Locale.getDefault())
-        return dateFormat.format(date)
-    }*/
 
     private fun isInternetConnected(): Boolean {
         val connectivityManager =

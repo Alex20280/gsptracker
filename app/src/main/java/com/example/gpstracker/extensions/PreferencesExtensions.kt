@@ -1,4 +1,4 @@
-package com.example.gpstracker.base.extentions
+package com.example.gpstracker.extensions
 
 import android.content.Context
 import android.content.SharedPreferences

@@ -1,7 +1,7 @@
 package com.example.gpstracker.prefs
 
 import android.content.Context
-import com.example.gpstracker.base.extentions.saveString
+import com.example.gpstracker.extensions.saveString
 import javax.inject.Inject
 
 class UserPreferences @Inject constructor(

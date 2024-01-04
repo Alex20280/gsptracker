@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
-import com.example.gpstracker.base.extentions.viewBinding
+import com.example.gpstracker.extensions.viewBinding
 import com.example.gpstracker.databinding.FragmentTrackBinding
 import com.example.gpstracker.ui.track.viewmodel.TrackViewModel
 import javax.inject.Inject
@@ -32,7 +32,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModelInstantiation()
+        injectDependencies()
         startButtonClicked()
         observeTrackState()
         initAnimation()
@@ -172,7 +172,7 @@ class TrackFragment : Fragment(R.layout.fragment_track) {
         trackViewModel.stopInternetAvailabilityCheck()
     }
 
-    private fun viewModelInstantiation() {
+    private fun injectDependencies() {
         (requireContext().applicationContext as App).appComponent.inject(this)
     }
 

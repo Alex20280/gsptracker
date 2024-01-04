@@ -77,26 +77,42 @@ android {
 
 dependencies {
 
-    //implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
-    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
-    implementation ("androidx.fragment:fragment-ktx:1.6.2")
 
 
     //Test
-    testImplementation("junit:junit:4.13.2")
+/*    androidTestImplementation("junit:junit:4.13.2")
+    implementation("androidx.test.ext:junit:1.1.5")
+    implementation("io.mockk:mockk-android:1.13.7")
+    debugImplementation("androidx.test:core:1.5.0")
+    debugImplementation("androidx.test:runner:1.5.2")
+    debugImplementation("androidx.test:rules:1.5.0")
+    testImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
+    testImplementation ("androidx.arch.core:core-testing:2.2.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+    debugImplementation ("android.arch.core:core-testing:1.1.1")
+    debugImplementation ("androidx.fragment:fragment-ktx:1.6.2")
+    implementation("androidx.test.espresso:espresso-intents:3.5.1")
+    implementation("androidx.test.espresso:espresso-core:3.5.1")*/
+
+    androidTestImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation("io.mockk:mockk-android:1.13.7")
+    androidTestImplementation("androidx.test:core:1.5.0")
     androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test.ext:truth:1.5.0")
     androidTestImplementation("androidx.test:rules:1.5.0")
-    androidTestImplementation("androidx.fragment:fragment-testing:1.6.1")
-    androidTestImplementation("io.mockk:mockk-android:1.13.1")//1.13.7
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    androidTestImplementation ("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
+    testImplementation ("androidx.arch.core:core-testing:2.2.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+    debugImplementation ("android.arch.core:core-testing:1.1.1")
+    debugImplementation ("androidx.fragment:fragment-ktx:1.6.2")
+    androidTestImplementation("androidx.test.espresso:espresso-intents:3.5.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
 
     //Dagger
     implementation("com.google.dagger:dagger:2.48")
@@ -108,7 +124,7 @@ dependencies {
     // Kotlin Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    debugImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.6.4")
 
     //Lifecycle
@@ -151,17 +167,12 @@ dependencies {
     kapt("androidx.room:room-compiler:2.5.2")
     implementation("androidx.room:room-ktx:2.5.2")
 
-    //Room
-    /*    implementation("androidx.room:room-common:2.5.2")
-        implementation("androidx.room:room-runtime:2.5.2")
-        //annotationProcessor("androidx.room:room-compiler:2.5.2")
-        kapt("androidx.room:room-compiler:2.5.2")
-        implementation("androidx.room:room-ktx:2.5.2")*/
-
     //Firebase
     //implementation (platform("com.google.firebase:firebase-bom:31.4.0"))
     implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
     implementation("com.google.firebase:firebase-analytics-ktx:21.3.0")
+    implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
+    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
 
     //WorkManager
     implementation("androidx.work:work-runtime-ktx:2.8.1")

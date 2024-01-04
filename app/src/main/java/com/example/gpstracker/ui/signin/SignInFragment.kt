@@ -1,21 +1,17 @@
 package com.example.gpstracker.ui.signin
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
-import com.example.gpstracker.base.extentions.checkFieldsForButtonColor
-import com.example.gpstracker.base.extentions.hideKeyboard
-import com.example.gpstracker.base.extentions.openScreen
-import com.example.gpstracker.base.extentions.viewBinding
+import com.example.gpstracker.extensions.hideKeyboard
+import com.example.gpstracker.extensions.openScreen
+import com.example.gpstracker.extensions.viewBinding
 import com.example.gpstracker.databinding.FragmentSignInBinding
+import com.example.gpstracker.extensions.isEmailAndPasswordValid
+import com.example.gpstracker.extensions.onTextChanged
 import com.example.gpstracker.network.RequestResult
 import com.example.gpstracker.ui.signin.viewmodel.SignInViewModel
 import javax.inject.Inject
@@ -30,7 +26,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModelInstantiation()
+        injectDependencies()
         editTextChangeListener()
         navigateToForgetPasswordScreen()
         initSubmitClickListener()
@@ -39,28 +35,36 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
     }
 
     private fun editTextChangeListener() {
-        binding.editTextEmail.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(p0: Editable?) {
-                checkFieldsForButtonColor(binding.editTextEmail, binding.editTextPassword, binding.button)
+        binding.editTextEmail.onTextChanged {
+            val email = binding.editTextEmail.text.toString().trim()
+            val password = binding.editTextPassword.text.toString().trim()
+            binding.button.isEnabled = isEmailAndPasswordValid(email, password)
+            if (email.isEmpty() || password.isEmpty()) {
+                binding.button.isEnabled = false
             }
-        })
+            updateButtonState()
+        }
 
-        binding.editTextPassword.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(p0: Editable?) {
-                checkFieldsForButtonColor(binding.editTextEmail, binding.editTextPassword, binding.button)
+        binding.editTextPassword.onTextChanged {
+            val email = binding.editTextEmail.text.toString().trim()
+            val password = binding.editTextPassword.text.toString().trim()
+            binding.button.isEnabled = isEmailAndPasswordValid(email, password)
+            if (email.isEmpty() || password.isEmpty()) {
+                binding.button.isEnabled = false
             }
-        })
+            updateButtonState()
+        }
     }
 
-    private fun viewModelInstantiation() {
+    private fun updateButtonState() {
+        if (binding.button.isEnabled) {
+            binding.button.setBackgroundColor(binding.button.context.getColor(R.color.colorAccent))
+        } else {
+            binding.button.setBackgroundColor(binding.button.context.getColor(R.color.grey))
+        }
+    }
+
+    private fun injectDependencies() {
         (requireContext().applicationContext as App).appComponent.inject(this)
     }
 

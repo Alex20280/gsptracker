@@ -1,17 +1,16 @@
 package com.example.gpstracker.ui.forgetpassword
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.gpstracker.R
 import com.example.gpstracker.app.App
-import com.example.gpstracker.base.extentions.checkFieldsForButtonColor
-import com.example.gpstracker.base.extentions.openScreen
-import com.example.gpstracker.base.extentions.viewBinding
+import com.example.gpstracker.extensions.openScreen
+import com.example.gpstracker.extensions.viewBinding
 import com.example.gpstracker.databinding.FragmentForgetPasswordBinding
+import com.example.gpstracker.extensions.isEmailAndPasswordValid
+import com.example.gpstracker.extensions.onTextChanged
 import com.example.gpstracker.network.RequestResult
 import com.example.gpstracker.ui.forgetpassword.viewmodel.ForgetPasswordViewModel
 import javax.inject.Inject
@@ -27,26 +26,24 @@ class ForgetPasswordFragment : Fragment(R.layout.fragment_forget_password) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModelInstantiation()
+        injectDependencies()
         editTextChangeListener()
         resetButtonClick()
         observePasswordResetResult()
     }
 
     private fun editTextChangeListener() {
-        binding.resetPasswordEt.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
-
-            override fun onTextChanged(text: CharSequence?, start: Int, before: Int, count: Int) {}
-
-            override fun afterTextChanged(p0: Editable?) {
-                checkFieldsForButtonColor(binding.resetPasswordEt, binding.resetPasswordEt, binding.submitBtn)
+        binding.resetPasswordEt.onTextChanged {
+            val email= binding.resetPasswordEt.text.toString().trim()
+            val password = binding.resetPasswordEt.text.toString().trim()
+            if (isEmailAndPasswordValid(email, password)){
+                binding.submitBtn.setBackgroundColor(binding.submitBtn.context.getColor(R.color.colorAccent))
+                binding.submitBtn.isEnabled = true
             }
-        })
-
+        }
     }
 
-    private fun viewModelInstantiation() {
+    private fun injectDependencies() {
         (requireContext().applicationContext as App).appComponent.inject(this)
     }
 

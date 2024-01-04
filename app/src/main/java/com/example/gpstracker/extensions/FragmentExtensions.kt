@@ -1,13 +1,11 @@
-package com.example.gpstracker.base.extentions
+package com.example.gpstracker.extensions
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
-import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -52,33 +50,20 @@ fun <T : ViewBinding> Fragment.viewBinding(bind: (View) -> T): ReadOnlyProperty<
         }
     }
 
-fun checkFieldsForButtonColor(
-    emailEditText: EditText,
-    passwordEditText: EditText,
-    button: Button
-) {
-    val email = emailEditText.text.toString().trim()
-    val password = passwordEditText.text.toString().trim()
-
-    val isEmailValid =
-        android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() && email.endsWith(".com")
-    val isPasswordValid = password.isNotEmpty()
-
-    val isDataValid = isEmailValid && isPasswordValid
-
-    if (isDataValid) {
-        button.setBackgroundColor(button.getContext().getColor(R.color.colorAccent))
-        enableButton(button)
-    } else {
-        button.setBackgroundColor(button.getContext().getColor(R.color.grey))
-        disableButton(button)
+fun EditText.onTextChanged(listener: (String) -> Unit) {
+    this.addTextChangedListener {
+        val text = it?.toString()?.trim() ?: ""
+        listener.invoke(text)
     }
 }
 
-private fun enableButton(button: Button) {
-    button.isEnabled = true
-}
+fun Fragment.isEmailAndPasswordValid(
+    emailEditText: String,
+    passwordEditText: String
+) : Boolean{
+    val isEmailValid =
+        android.util.Patterns.EMAIL_ADDRESS.matcher(emailEditText).matches() && emailEditText.endsWith(".com")
+    val isPasswordValid = passwordEditText.isNotEmpty()
 
-private fun disableButton(button: Button) {
-    button.isEnabled = false
+    return isEmailValid && isPasswordValid
 }

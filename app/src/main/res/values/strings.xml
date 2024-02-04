@@ -1,3 +1,21 @@
 <resources>
-    <string name="app_name">GPSTracker</string>
+    <string name="app_name">Tracker</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="user_name">User Name</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="sign_in">Sign In</string>
+    <string name="don_t_have_an_account_sign_up">Don\'t have an account? Sign up</string>
+    <string name="reset">Reset</string>
+    <string name="enter_your_email_address_here">Enter your email address here</string>
+    <string name="email">Email</string>
+    <string name="register">Register</string>
+    <string name="invalid_password_warning">Password must be at least 8 characters, should have digits, latters, special character and at least 1 uppercase letter</string>
+    <string name="invalid_email_warning">Invalid email</string>
+    <string name="tracker_is_off">TRACKER IS OFF</string>
+    <string name="gps_is_off">GPS IS OFF</string>
+    <string name="tracker_collects_locations">TRACKER COLLECTS LOCATIONS</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
 </resources>

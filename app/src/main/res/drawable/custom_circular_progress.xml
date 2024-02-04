@@ -1,0 +1,21 @@
+<!-- res/drawable/custom_circular_progress.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background (circle shape) -->
+    <item android:id="@android:id/background">
+        <shape
+            android:shape="ring"
+            android:thickness="20dp"
+            android:useLevel="false">
+            <solid android:color="#E0E0E0" /> <!-- Background color (grey) -->
+        </shape>
+    </item>
+    <!-- Progress (circular fill) -->
+    <item android:id="@android:id/progress">
+        <shape
+            android:shape="ring"
+            android:thickness="20dp"
+            android:useLevel="true">
+            <solid android:color="#FFAA00" /> <!-- Progress color (red) -->
+        </shape>
+    </item>
+</layer-list>
